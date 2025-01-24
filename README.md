@@ -40,10 +40,11 @@ Then, press and hold the button on the device while plugging it into your PC. Th
 
 ### Setup
 
-Clone the repository and initialize submodules:
+Clone the repository with submodules:
 
 ```sh
-git submodule update --init
+git clone https://github.com/IvanVnucec/catchcam --recurse-submodules
+cd catchcam
 ```
 
 ### Build
@@ -55,3 +56,7 @@ cmake -B build -S .
 # Build the project
 cmake --build build
 ```
+
+### Flash
+
+To flash the device, you need to put it into the bootloader mode. To do this, press and hold the button on the device while plugging it into your PC. The device will show up as a USB drive, and you can drag-and-drop the new software onto it located under `build/catchcam.uf2`. After the update is complete, the device will restart and you're good to go.
