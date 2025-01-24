@@ -30,3 +30,28 @@ Speed camera database is updated regularly from the [OpenStreetMap](https://www.
 To update the device, first you need to download the latest software from the [releases](https://github.com/IvanVnucec/catchcam/releases) page.
 
 Then, press and hold the button on the device while plugging it into your PC. The device will show up as a USB drive, and you can drag-and-drop the new software onto it. After the update is complete, the device will restart and you're good to go.
+
+## Development
+
+### Prerequisites
+
+- CMake 3.13+
+- Raspberry Pi Pico SDK (version 2.0.0)
+
+### Setup
+
+Clone the repository and initialize submodules:
+
+```sh
+git submodule update --init
+```
+
+### Build
+
+```sh
+# Configure the project
+cmake -B build -S .
+
+# Build the project
+cmake --build build
+```
