@@ -1,0 +1,46 @@
+.program pio_lsbj_out
+.side_set 2 ; 0 = bclk, 1=wclk
+
+; The C code should place (number of bits/sample - 2) in Y and
+; also update the SHIFTCTRL to be 24 or 32 as appropriate
+
+;                           +----- WCLK
+;                           |+---- BCLK
+    mov x, y         side 0b01
+left1:
+    out pins, 1      side 0b10
+    jmp x--, left1   side 0b11
+    out pins, 1      side 0b10
+
+    mov x, y         side 0b11
+right1:
+    out pins, 1      side 0b00
+    jmp x--, right1  side 0b01
+    out pins, 1      side 0b00
+    ; Loop back to beginning...
+
+% c-sdk {
+
+static inline void pio_lsbj_out_program_init(PIO pio, uint sm, uint offset, uint data_pin, uint clock_pin_base, uint bits) {
+    pio_gpio_init(pio, data_pin);
+    pio_gpio_init(pio, clock_pin_base);
+    pio_gpio_init(pio, clock_pin_base + 1);
+
+    pio_sm_config sm_config = pio_lsbj_out_program_get_default_config(offset);
+
+    sm_config_set_out_pins(&sm_config, data_pin, 1);
+    sm_config_set_sideset_pins(&sm_config, clock_pin_base);
+    sm_config_set_out_shift(&sm_config, false, true, (bits <= 16) ? 2 * bits : bits);
+    sm_config_set_fifo_join(&sm_config, PIO_FIFO_JOIN_TX);
+
+    pio_sm_init(pio, sm, offset, &sm_config);
+
+    pio_sm_set_consecutive_pindirs(pio, sm, data_pin, 1, true);
+    pio_sm_set_consecutive_pindirs(pio, sm, clock_pin_base, 2, true);
+    pio_sm_set_set_pins(pio, sm, data_pin, 1);
+    pio_sm_set_set_pins(pio, sm, clock_pin_base, 2);
+
+    pio_sm_exec(pio, sm, pio_encode_set(pio_y, bits - 2));
+}
+
+%}
