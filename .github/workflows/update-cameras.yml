@@ -1,0 +1,20 @@
+name: update-cameras
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'
+jobs:
+  periodic-update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: update
+        run: |
+          python3 scripts/fetch_cameras/fetch.py src/cams/cams_list.h
+      - name: push
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email ""
+          git add .
+          git diff-index --quiet HEAD || git commit -m "update cameras"
+          git push
