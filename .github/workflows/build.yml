@@ -44,13 +44,17 @@ jobs:
       working-directory: ${{github.workspace}}/catchcam/build
       run: PICO_SDK_PATH=../../pico-sdk cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 
+    - name: Get core count
+      id: core_count
+      run : cat /proc/cpuinfo  | grep processor | wc -l
+
     - name: Build
       working-directory: ${{github.workspace}}/catchcam/build
       shell: bash
-      run: cmake --build . --config $BUILD_TYPE
+      run: cmake --build . --config $BUILD_TYPE --parallel $(nproc)
 
     - name: Upload Build Artifact
       uses: actions/upload-artifact@v3
       with:
-        name: catcam.uf2
-        path: ${{github.workspace}}/catchcam/build/catcam.uf2
+        name: catchcam.uf2
+        path: ${{github.workspace}}/catchcam/build/catchcam.uf2

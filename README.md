@@ -36,6 +36,7 @@ Then, press and hold the button on the device while plugging it into your PC. Th
 ### Prerequisites
 
 - CMake 3.13+
+- arm-none-eabi-gcc 10.3+
 - Raspberry Pi Pico SDK (version 2.0.0)
 
 ### Setup
