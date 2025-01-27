@@ -1,4 +1,4 @@
-name: build
+name: build-and-release
 
 on:
   push:
@@ -9,8 +9,9 @@ env:
   BUILD_TYPE: Release
 
 jobs:
-  build:
+  build-and-release:
     runs-on: ubuntu-latest
+
     steps:
     - name: Checkout catchcam
       uses: actions/checkout@v4
@@ -58,3 +59,10 @@ jobs:
       with:
         name: catchcam.uf2
         path: ${{github.workspace}}/catchcam/build/catchcam.uf2
+
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ github.ref_name }}
+        draft: true
+        files: ${{github.workspace}}/catchcam/build/catchcam.uf2
