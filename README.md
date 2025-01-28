@@ -1,8 +1,8 @@
 # Catchcam
 
 <div style="display: flex;">
-  <img src="images/catchcam.jpg" alt="Catchcam device plugged in" style="height: 300px; margin-right: 10px;">
-  <img src="images/catchcam_internals.jpg" alt="Catchcam device internals" style="height: 300px;">
+  <img src="docs/images/catchcam.jpg" alt="Catchcam device plugged in" style="height: 350px; margin-right: 10px;">
+  <img src="docs/images/catchcam_internals.jpg" alt="Catchcam device internals" style="height: 350px;">
 </div>
 
 ## About
