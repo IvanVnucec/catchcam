@@ -11,3 +11,6 @@ struct __packed cams_camera_info {
 };
 
 void cams_get_nearest_camera(const struct cams_camera_info **cam, const struct gnss_position *pos);
+
+
+void cams_get_nearest_camera_inside_radius(const struct cams_camera_info **cam, const struct gnss_position *pos, float radius);
