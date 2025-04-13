@@ -1,9 +1,14 @@
 name: build-and-release
-
 on:
   push:
+    branches:
+      - main
+    tags:
+      - 'v*'
   pull_request:
   workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'
 
 env:
   BUILD_TYPE: Release
@@ -11,58 +16,63 @@ env:
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout catchcam
-      uses: actions/checkout@v4
-      with:
-        path: catchcam
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
-    - name: Checkout catchcam submodules
-      working-directory: ${{github.workspace}}/catchcam
-      run: git submodule update --init
+      - name: Update camera list
+        run: python3 scripts/fetch_cameras/fetch.py src/cams/cams_list.h
 
-    - name: Install dependencies
-      run: sudo apt-get install -y cmake gcc-arm-none-eabi
+      - name: Commit and push changes
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add src/cams/cams_list.h
+          git diff-index --quiet HEAD || git commit -m "Update cameras list"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Checkout pico-sdk/develop
-      uses: actions/checkout@v4
-      with:
-        repository: raspberrypi/pico-sdk
-        ref: develop
-        path: pico-sdk
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y cmake gcc-arm-none-eabi
 
-    - name: Checkout pico-sdk submodules
-      working-directory: ${{github.workspace}}/pico-sdk
-      run: git submodule update --init
+      - name: Checkout pico-sdk
+        uses: actions/checkout@v4
+        with:
+          repository: raspberrypi/pico-sdk
+          ref: develop
+          path: pico-sdk
 
-    - name: Create Build Environment
-      working-directory: ${{github.workspace}}/catchcam
-      run:  cmake -E make_directory ${{github.workspace}}/catchcam/build
+      - name: Checkout pico-sdk submodules
+        working-directory: ${{github.workspace}}/pico-sdk
+        run: git submodule update --init
 
-    - name: Configure CMake
-      shell: bash
-      working-directory: ${{github.workspace}}/catchcam/build
-      run: PICO_SDK_PATH=../../pico-sdk cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+      - name: Create build directory
+        run: mkdir -p build
 
-    - name: Get core count
-      id: core_count
-      run : cat /proc/cpuinfo  | grep processor | wc -l
+      - name: Configure CMake
+        working-directory: ${{github.workspace}}/build
+        run: PICO_SDK_PATH=../pico-sdk cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 
-    - name: Build
-      working-directory: ${{github.workspace}}/catchcam/build
-      shell: bash
-      run: cmake --build . --config $BUILD_TYPE --parallel $(nproc)
+      - name: Build
+        working-directory: ${{github.workflow}}/build
+        run: cmake --build . --config $BUILD_TYPE --parallel $(nproc)
 
-    - name: Upload Build Artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: catchcam.uf2
-        path: ${{github.workspace}}/catchcam/build/catchcam.uf2
+      - name: Check artifact exists
+        run: test -f build/catchcam.uf2 || { echo "Build artifact not found"; exit 1; }
 
-    - name: Release
-      uses: softprops/action-gh-release@v1
-      with:
-        tag_name: ${{ github.ref_name }}
-        draft: true
-        files: ${{github.workspace}}/catchcam/build/catchcam.uf2
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: catchcam.uf2
+          path: build/catchcam.uf2
+
+      - name: Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          draft: false
+          files: build/catchcam.uf2
