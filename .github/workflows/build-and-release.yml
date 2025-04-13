@@ -22,14 +22,14 @@ jobs:
           submodules: recursive
 
       - name: Update camera list
-        run: python3 {{github.workspace}}/scripts/fetch_cameras/fetch.py {{github.workspace}}/src/cams/cams_list.h
+        run: python3 ${{github.workspace}}/scripts/fetch_cameras/fetch.py ${{github.workspace}}/src/cams/cams_list.h
 
       - name: Commit and push changes
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@users.noreply.github.com"
-          git add {{github.workspace}}/src/cams/cams_list.h
+          git add ${{github.workspace}}/src/cams/cams_list.h
           git diff-index --quiet HEAD || git commit -m "Update cameras list"
           git push
         env:
@@ -43,7 +43,7 @@ jobs:
         with:
           repository: raspberrypi/pico-sdk
           ref: develop
-          path: {{github.workspace}}/pico-sdk
+          path: ${{github.workspace}}/pico-sdk
 
       - name: Checkout pico-sdk submodules
         working-directory: ${{github.workspace}}/pico-sdk
@@ -54,7 +54,7 @@ jobs:
 
       - name: Configure CMake
         working-directory: ${{github.workspace}}/build
-        run: PICO_SDK_PATH={{github.workspace}}/pico-sdk cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+        run: PICO_SDK_PATH=${{github.workspace}}/pico-sdk cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 
       - name: Build
         working-directory: ${{github.workspace}}/build
