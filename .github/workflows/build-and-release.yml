@@ -22,14 +22,14 @@ jobs:
           submodules: recursive
 
       - name: Update camera list
-        run: python3 scripts/fetch_cameras/fetch.py src/cams/cams_list.h
+        run: python3 {{github.workspace}}/scripts/fetch_cameras/fetch.py {{github.workspace}}/src/cams/cams_list.h
 
       - name: Commit and push changes
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@users.noreply.github.com"
-          git add src/cams/cams_list.h
+          git add {{github.workspace}}/src/cams/cams_list.h
           git diff-index --quiet HEAD || git commit -m "Update cameras list"
           git push
         env:
@@ -43,28 +43,28 @@ jobs:
         with:
           repository: raspberrypi/pico-sdk
           ref: develop
-          path: pico-sdk
+          path: {{github.workspace}}/pico-sdk
 
       - name: Checkout pico-sdk submodules
         working-directory: ${{github.workspace}}/pico-sdk
         run: git submodule update --init
 
       - name: Create build directory
-        run: mkdir -p ${{github.workspace}}/catchcam/build
+        run: mkdir -p ${{github.workspace}}/build
 
       - name: Configure CMake
-        working-directory: ${{github.workspace}}/catchcam/build
-        run: PICO_SDK_PATH=../../pico-sdk cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+        working-directory: ${{github.workspace}}/build
+        run: PICO_SDK_PATH={{github.workspace}}/pico-sdk cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 
       - name: Build
-        working-directory: ${{github.workspace}}/catchcam/build
+        working-directory: ${{github.workspace}}/build
         run: cmake --build . --config $BUILD_TYPE --parallel $(nproc)
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: catchcam.uf2
-          path: ${{github.workspace}}/catchcam/build/catchcam.uf2
+          path: ${{github.workspace}}/build/catchcam.uf2
 
       - name: Release
         if: startsWith(github.ref, 'refs/tags/')
@@ -72,4 +72,4 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
           draft: false
-          files: ${{github.workspace}}/catchcam/build/catchcam.uf2
+          files: ${{github.workspace}}/build/catchcam.uf2
