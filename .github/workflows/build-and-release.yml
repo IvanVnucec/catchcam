@@ -24,17 +24,6 @@ jobs:
       - name: Update camera list
         run: python3 ${{github.workspace}}/scripts/fetch_cameras/fetch.py ${{github.workspace}}/src/cams/cams_list.h
 
-      - name: Commit and push changes
-        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
-        run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@users.noreply.github.com"
-          git add ${{github.workspace}}/src/cams/cams_list.h
-          git diff-index --quiet HEAD || git commit -m "Update cameras list"
-          git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Setup Pico SDK
         run: |
           wget https://raw.githubusercontent.com/raspberrypi/pico-setup/4567073441c6ef298988baf49a8700f507c3b5a0/pico_setup.sh
@@ -49,8 +38,20 @@ jobs:
         run: cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 
       - name: Build
+        id: build
         working-directory: ${{github.workspace}}/build
         run: cmake --build . --config $BUILD_TYPE --parallel $(nproc)
+
+      - name: Commit and push changes
+        if: steps.build.outcome == 'success' && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add ${{github.workspace}}/src/cams/cams_list.h
+          git diff-index --quiet HEAD || git commit -m "Update cameras list"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
