@@ -21,11 +21,6 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Minor
-        run: |
-          sudo apt-get install -y tree
-          tree -L 5 ${{github.workspace}}
-
       - name: Update camera list
         run: python3 ${{github.workspace}}/scripts/fetch_cameras/fetch.py ${{github.workspace}}/src/cams/cams_list.h
 
@@ -40,26 +35,18 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y cmake gcc-arm-none-eabi
-
-      - name: Checkout pico-sdk
-        uses: actions/checkout@v4
-        with:
-          repository: raspberrypi/pico-sdk
-          ref: develop
-          path: ${{github.workspace}}/pico-sdk
-
-      - name: Checkout pico-sdk submodules
-        working-directory: ${{github.workspace}}/pico-sdk
-        run: git submodule update --init
+      - name: Setup Pico SDK
+        run: |
+          wget https://raw.githubusercontent.com/raspberrypi/pico-setup/4567073441c6ef298988baf49a8700f507c3b5a0/pico_setup.sh
+          chmod +x pico_setup.sh
+          SKIP_OPENOCD=1 SKIP_VSCODE=1 SKIP_UART=1 ./pico_setup.sh
 
       - name: Create build directory
         run: mkdir -p ${{github.workspace}}/build
 
       - name: Configure CMake
         working-directory: ${{github.workspace}}/build
-        run: PICO_SDK_PATH=${{github.workspace}}/pico-sdk cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+        run: cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 
       - name: Build
         working-directory: ${{github.workspace}}/build
