@@ -21,6 +21,11 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Minor
+        run: |
+          sudo apt-get install -y tree
+          tree -L 5 ${{github.workspace}}
+
       - name: Update camera list
         run: python3 ${{github.workspace}}/scripts/fetch_cameras/fetch.py ${{github.workspace}}/src/cams/cams_list.h
 
