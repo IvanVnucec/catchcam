@@ -15,7 +15,7 @@ env:
 
 jobs:
   build-and-release:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout catchcam
       uses: actions/checkout@v4
@@ -34,6 +34,9 @@ jobs:
         path: pico-sdk
         submodules: recursive
 
+    - name: Update camera list
+      run: python3 ${{github.workspace}}/catchcam/scripts/fetch_cameras/fetch.py ${{github.workspace}}/catchcam/src/cams/cams_list.h
+
     - name: Create Build Environment
       working-directory: ${{github.workspace}}/catchcam
       run:  cmake -E make_directory ${{github.workspace}}/catchcam/build
@@ -44,9 +47,21 @@ jobs:
       run: PICO_SDK_PATH=../../pico-sdk cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 
     - name: Build
+      id: build
       working-directory: ${{github.workspace}}/catchcam/build
       shell: bash
       run: cmake --build . --config $BUILD_TYPE --parallel $(nproc)
+
+    - name: Commit and push changes
+      if: steps.build.outcome == 'success' && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')
+      run: |
+        git config user.name "github-actions"
+        git config user.email "github-actions@users.noreply.github.com"
+        git add ${{github.workspace}}/catchcam/src/cams/cams_list.h
+        git diff-index --quiet HEAD || git commit -m "Update cameras list"
+        git push
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Upload Build Artifact
       uses: actions/upload-artifact@v4
@@ -58,5 +73,5 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         tag_name: ${{ github.ref_name }}
-        draft: true
+        draft: false
         files: ${{github.workspace}}/catchcam/build/catchcam.uf2
