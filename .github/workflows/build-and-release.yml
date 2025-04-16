@@ -17,55 +17,50 @@ jobs:
   build-and-release:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
+    - name: Clean workspace
+      run: |
+        echo "Cleaning up previous run"
+        rm -rf "${{ github.workspace }}"
+        mkdir -p "${{ github.workspace }}"
 
-      - name: Setup Pico SDK
-        run: |
-          pushd ~/
-          wget https://github.com/ARM-software/CMSIS_5/archive/refs/tags/5.9.0.zip  && unzip 5.9.0.zip && rm 5.9.0.zip && ln -s  CMSIS_5-5.9.0 CMSIS_5
-          popd
-          wget https://raw.githubusercontent.com/raspberrypi/pico-setup/4567073441c6ef298988baf49a8700f507c3b5a0/pico_setup.sh
-          chmod +x pico_setup.sh
-          SKIP_OPENOCD=1 SKIP_VSCODE=1 SKIP_UART=1 ./pico_setup.sh
+    - name: Checkout pico-examples
+      uses: actions/checkout@v4
+      with:
+        path: pico-examples
 
-      - name: Update camera list
-        run: python3 ${{github.workspace}}/scripts/fetch_cameras/fetch.py ${{github.workspace}}/src/cams/cams_list.h
+    - name: Checkout pico-sdk/develop
+      uses: actions/checkout@v4
+      with:
+        repository: raspberrypi/pico-sdk
+        ref: develop
+        path: pico-sdk
 
-      - name: Create build directory
-        run: mkdir -p ${{github.workspace}}/build
+    - name: Checkout pico-sdk submodules
+      working-directory: ${{github.workspace}}/pico-sdk
+      run: git submodule update --init
 
-      - name: Configure CMake
-        working-directory: ${{github.workspace}}/build
-        run: cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+    - name: Create Build Environment
+      # Some projects don't allow in-source building, so create a separate build directory
+      # We'll use this as our working directory for all subsequent commands
+      working-directory: ${{github.workspace}}/pico-examples
+      run:  cmake -E make_directory ${{github.workspace}}/pico-examples/build
 
-      - name: Build
-        id: build
-        working-directory: ${{github.workspace}}/build
-        run: cmake --build . --config $BUILD_TYPE --parallel $(nproc)
+    - name: Configure CMake
+      # Use a bash shell so we can use the same syntax for environment variable
+      # access regardless of the host operating system
+      shell: bash
+      working-directory: ${{github.workspace}}/pico-examples/build
+      # Note the current convention is to use the -S and -B options here to specify source
+      # and build directories, but this is only available with CMake 3.13 and higher.
+      # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
+      run: PICO_SDK_PATH=../../pico-sdk cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 
-      - name: Commit and push changes
-        if: steps.build.outcome == 'success' && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')
-        run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@users.noreply.github.com"
-          git add ${{github.workspace}}/src/cams/cams_list.h
-          git diff-index --quiet HEAD || git commit -m "Update cameras list"
-          git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Get core count
+      id: core_count
+      run : cat /proc/cpuinfo  | grep processor | wc -l
 
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: catchcam.uf2
-          path: ${{github.workspace}}/build/catchcam.uf2
-
-      - name: Release
-        if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ github.ref_name }}
-          draft: false
-          files: ${{github.workspace}}/build/catchcam.uf2
+    - name: Build
+      working-directory: ${{github.workspace}}/pico-examples/build
+      shell: bash
+      # Execute the build.  You can specify a specific target with "--target <NAME>"
+      run: cmake --build . --config $BUILD_TYPE --parallel $(nproc)
