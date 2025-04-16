@@ -29,8 +29,8 @@ def get_cameras():
         except:
             no_maxspeed_cnt += 1
             limit = 0
-        print(f"Found {no_maxspeed_cnt} cameras with invalid maxspeed value")
         cameras.append({'id': node['id'], 'lat': lat, 'lon': lon, 'limit': limit})
+    print(f"Found {no_maxspeed_cnt} cameras with invalid maxspeed value")
     return cameras
 
 def generate_c_file(output_file, data_list):
