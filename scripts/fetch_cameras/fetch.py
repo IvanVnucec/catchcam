@@ -16,21 +16,20 @@ out geom;
 def get_cameras():
     overpass = get_speed_cameras_from_overpass_api()
     cameras = []
-    no_maxspeed_cnt = 0
+    invalid_maxspeed_cnt = 0
     for node in overpass:
         lat, lon = float(node['lat']), float(node['lon'])
         try:
             maxspeed = node['tags']['maxspeed']
         except:
-            no_maxspeed_cnt += 1
             maxspeed = '0'
         try:
             limit = int(maxspeed.split()[0])
         except:
-            no_maxspeed_cnt += 1
+            invalid_maxspeed_cnt += 1
             limit = 0
         cameras.append({'id': node['id'], 'lat': lat, 'lon': lon, 'limit': limit})
-    print(f"Found {no_maxspeed_cnt} cameras with invalid maxspeed value")
+    print(f"Found {invalid_maxspeed_cnt} cameras with invalid maxspeed value")
     return cameras
 
 def generate_c_file(output_file, data_list):
@@ -73,7 +72,7 @@ def main(output_file):
         print("No cameras found")
         sys.exit(1)
     cameras_sorted = sorted(cameras, key=lambda x: (x['lat'], x['lon']))
-    print(f"Found {len(cameras_sorted)} cameras")
+    print(f"Found total {len(cameras_sorted)} cameras")
     print(f"Generating C file: {output_file}")
     generate_c_file(output_file, cameras_sorted)
     print("Done")
