@@ -26,6 +26,9 @@ jobs:
 
       - name: Setup Pico SDK
         run: |
+          pushd ~/
+          wget https://github.com/ARM-software/CMSIS_5/archive/refs/tags/5.9.0.zip  && unzip 5.9.0.zip && rm 5.9.0.zip && ln -s  CMSIS_5-5.9.0 CMSIS_5
+          popd
           wget https://raw.githubusercontent.com/raspberrypi/pico-setup/4567073441c6ef298988baf49a8700f507c3b5a0/pico_setup.sh
           chmod +x pico_setup.sh
           SKIP_OPENOCD=1 SKIP_VSCODE=1 SKIP_UART=1 ./pico_setup.sh
