@@ -21,9 +21,6 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Update camera list
-        run: python3 ${{github.workspace}}/scripts/fetch_cameras/fetch.py ${{github.workspace}}/src/cams/cams_list.h
-
       - name: Setup Pico SDK
         run: |
           pushd ~/
@@ -32,6 +29,9 @@ jobs:
           wget https://raw.githubusercontent.com/raspberrypi/pico-setup/4567073441c6ef298988baf49a8700f507c3b5a0/pico_setup.sh
           chmod +x pico_setup.sh
           SKIP_OPENOCD=1 SKIP_VSCODE=1 SKIP_UART=1 ./pico_setup.sh
+
+      - name: Update camera list
+        run: python3 ${{github.workspace}}/scripts/fetch_cameras/fetch.py ${{github.workspace}}/src/cams/cams_list.h
 
       - name: Create build directory
         run: mkdir -p ${{github.workspace}}/build
