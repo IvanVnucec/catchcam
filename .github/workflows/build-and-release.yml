@@ -1,6 +1,9 @@
 name: build-and-release
 on:
   push:
+    paths-ignore:
+      - 'docs/**'
+      - '.vscode/**'
     branches:
       - master
     tags:
