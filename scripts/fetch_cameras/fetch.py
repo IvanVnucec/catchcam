@@ -16,20 +16,20 @@ out geom;
 def get_cameras():
     overpass = get_speed_cameras_from_overpass_api()
     cameras = []
+    no_maxspeed_cnt = 0
     for node in overpass:
         lat, lon = float(node['lat']), float(node['lon'])
         try:
             maxspeed = node['tags']['maxspeed']
         except:
-            print(f"Warning: {node} has no 'maxspeed' tag")
+            no_maxspeed_cnt += 1
             maxspeed = '0'
-
         try:
             limit = int(maxspeed.split()[0])
         except:
-            print(f"Warning: {node} has invalid 'maxspeed' tag")
+            no_maxspeed_cnt += 1
             limit = 0
-
+        print(f"Found {no_maxspeed_cnt} cameras with invalid maxspeed value")
         cameras.append({'id': node['id'], 'lat': lat, 'lon': lon, 'limit': limit})
     return cameras
 
