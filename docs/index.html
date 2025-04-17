@@ -1,78 +1,143 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Catchcam</title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    </head>
-    <body>
-        <div class="container mt-4">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description"
+        content="Catchcam is a privacy-focused, offline speed camera detector that alerts drivers without tracking their location.">
+    <meta name="keywords" content="speed camera detector, Catchcam, offline GPS, privacy driving">
+    <meta property="og:title" content="Catchcam - Offline Speed Camera Detector">
+    <meta property="og:description"
+        content="Discover Catchcam, the plug-and-play speed camera detector that prioritizes your privacy.">
+    <!-- TODO: fix link -->
+    <meta property="og:image" content="https://yourwebsite.com/catchcam-image.jpg">
+    <title>Catchcam - Offline Speed Camera Detector</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <!-- TODO: add favicon -->
+    <style>
+        .section-header {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-list li {
+            margin-bottom: 0.75rem;
+        }
+
+        .navbar {
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        footer {
+            background-color: #f8f9fa;
+            padding: 2rem 0;
+        }
+    </style>
+</head>
+
+<body>
+    <main class="container mt-4">
+        <section id="about">
             <h1 class="text-center">Catchcam</h1>
             <h2 class="section-header">About</h2>
             <p>
-                Catchcam is a plug and play speed camera detector that works completely offline.
-                It's similar to popular Waze or Radarbot apps, but with total privacy in mind - nobody tracks where you are, and no internet connection is needed. Just plug it into a car's USB socket and drive.
-                <!-- TODO: add that the device is legal in most countries worldwide with a few exceptions (add link) -->
+                Catchcam is a plug-and-play speed camera detector that operates entirely offline, ensuring complete
+                privacy. Unlike apps like Waze or Radarbot, Catchcam requires no internet connection and doesn’t track
+                your location. Simply plug it into your car’s USB port and drive.
             </p>
             <p>
-                It features:
-                <ul>
-                    <li>Built-in speaker and LED for alerts,</li>
-                    <li>Already packed with 66,000+ known speed camera world-wide, with more coming soon each day,</li>
-                    <li>Easy updates - just plug into your PC and drag-and-drop the latest software.</li>
-                </ul>
+                Key features include:
+            <ul class="feature-list">
+                <li>Built-in speaker and LED for real-time alerts</li>
+                <li>Preloaded with over 66,000 speed camera locations worldwide</li>
+                <li>Easy updates via drag-and-drop on your PC</li>
+            </ul>
             </p>
+        </section>
 
+        <section id="how-it-works">
             <h2 class="section-header">How it Works</h2>
             <p>
-                Catchcam uses a GPS module to determine your speed and position. It then compares your position to a database of known speed camera locations. If you're approaching a speed camera, Catchcam will alert you with a voice message spefiying the camera speed limit and a visual LED alert. Speed camera database is updated regularly from the <a href="https://www.openstreetmap.org/">OpenStreetMap</a>.
+                Catchcam uses a built-in GPS module to track your speed and location. It cross-references your position
+                with a database of over 66,000 speed camera locations worldwide. When approaching a camera, Catchcam
+                alerts you with a voice message specifying the speed limit and a flashing LED.
             </p>
             <p>
-                Each day there is about 50 new speed camera added to the database. You can check a map below to see speed camera coverage in your area.
+                The speed camera database is updated daily from <a href="https://www.openstreetmap.org/"
+                    target="_blank">OpenStreetMap</a>, with approximately 50 new cameras added each day. Explore the map
+                below to view coverage in your area.
+                <!-- TODO: add map -->
             </p>
-            <!-- TODO: Add a map that shows speed camera positions -->
-            <p>
-                You can check a short demo below:
-                <!-- TODO: Add video -->
+            <p class="mt-2 mb-3">
+                Watch a short demo:
             </p>
+            <div class="ratio ratio-16x9">
+                <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Catchcam Demo" allowfullscreen></iframe>
+            </div>
+        </section>
 
+        <section id="installation">
             <h2 class="section-header">Installation</h2>
             <p>
-                <ol>
-                    <li>Grab a USB-C cable and plug connect a car USB socket with Catchcam</li>
-                    <li>Put the Catchcam on the windscreen dash panel with the top side facing up. You can also place it on a seat or elswhere where you find it convinient.</li>
-                </ol>
+            <ol>
+                <li>Connect Catchcam to your car’s USB socket using a USB-C cable.</li>
+                <li>Place Catchcam on the windshield dashboard with the top side facing up, or position it conveniently
+                    on a seat or elsewhere.</li>
+            </ol>
             </p>
+        </section>
 
+        <section id="device-update">
             <h2 class="section-header">Device Update</h2>
             <p>
-                Device update with the newsest speed camera positions are as straightforward as using an ordinary USB thumb drive. The steps are as follows:
-                <ol>
-                    <li>Download latest <a href="https://github.com/IvanVnucec/catchcam/releases/download/master/catchcam.uf2">catchcam.uf2</a> file.</li>
-                    <li>Grab a USB-C connector and connect one end to your PC.</li>
-                    <li>Press and hold Update button located on the right side of device with a paperclip or toothpick and connect the other end of the USB-C cable.</li>
-                    <li>The device should appear in your file explorer as a USB thumb drive.</li>
-                    <li>Drag and drop a newly downloaded catchcam.uf2 file to the device and wait for device to restart itself. It should take about 10-30 seconds.</li>
-                </ol>
+                Updating Catchcam with the latest speed camera database is as easy as using a USB thumb drive:
+            <ol>
+                <li>Download the latest <a
+                        href="https://github.com/IvanVnucec/catchcam/releases/download/master/catchcam.uf2"
+                        target="_self">catchcam.uf2</a> file.</li>
+                <li>Connect one end of a USB-C cable to your PC.</li>
+                <li>Press and hold the Update button on the right side of the device (use a paperclip or toothpick)
+                    while connecting the other end of the USB-C cable.</li>
+                <li>The device will appear as a USB thumb drive in your file explorer.</li>
+                <li>Drag and drop the downloaded <code>catchcam.uf2</code> file to the device and wait for it to restart
+                    (10-30 seconds).</li>
+            </ol>
             </p>
+        </section>
 
+        <section id="buy-now">
             <h2 class="section-header">Buy It Now</h2>
             <p>
-                If you're interested, you can pre-order a sample by contacting me at [vnucec.ivan@gmail.com]().
+                Ready to drive with confidence? Pre-order your Catchcam by emailing <a
+                    href="mailto:vnucec.ivan@gmail.com">vnucec.ivan@gmail.com</a>.
             </p>
+        </section>
 
+        <section id="contribute">
             <h2 class="section-header">Contribute</h2>
             <p>
-                If there is a newly added speed camera in your area and you want to add it to your device, you can go to [openstreetsmap]() and add it to their database. It's not that hard to do it in my opinion. You can find [instructions]() on how to do that. On a next day - after the system builds incorporates newly added camera, the device can be updated by following alredy familiar [update]() steps.
-                If the earlier steps sounds difficult to you, you can always contact me at [vnucec.ivan@gmail.com]() with speed camera information and I will add it myself.
+                Help improve Catchcam by adding new speed cameras to the <a href="https://www.openstreetmap.org/"
+                    target="_blank">OpenStreetMap</a> database. It’s simple - follow these <a
+                    href="https://wiki.openstreetmap.org/wiki/Beginners%27_guide" target="_blank">instructions</a>.
+                Alternatively, send camera details to <a href="mailto:vnucec.ivan@gmail.com">vnucec.ivan@gmail.com</a>,
+                and I’ll add them for you.
             </p>
+        </section>
+    </main>
+
+    <footer class="mt-5">
+        <div class="container text-center">
+            <p>Contact: <a href="mailto:vnucec.ivan@gmail.com">vnucec.ivan@gmail.com</a> | &copy; 2025 Catchcam</p>
         </div>
+    </footer>
 
-        <!-- TODO: Fix size -->
-        <img class="z-1 position-absolute w-100" src="https://taginfo.openstreetmap.org/api/4/tag/distribution/nodes?key=highway&value=speed_camera">
-        <img class="z-0 position-absolute w-100" src="https://taginfo.openstreetmap.org/img/mapbg/world.png">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+</body>
 
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    </body>
 </html>
