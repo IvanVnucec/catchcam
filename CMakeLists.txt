@@ -70,5 +70,4 @@ pico_generate_pio_header(catchcam ${CMAKE_CURRENT_LIST_DIR}/src/audio/i2s_lsbj.p
 # create map/bin/hex file etc.
 pico_add_extra_outputs(catchcam)
 
-# TODO: add url via pico_set_program_url
-# pico_set_program_url()
+pico_set_program_url(${PROJECT_NAME} "https://ivanvnucec.github.io/catchcam")
