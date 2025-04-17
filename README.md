@@ -12,7 +12,7 @@ Catchcam is a plug and play speed camera detector that works completely offline.
 It features:
 
 - Built-in speaker and LED for alerts,
-- Already packed with 66,000+ known speed camera positions, with more coming soon,
+- Already packed with 66,000+ known speed camera positions world-wide, with more coming soon each day,
 - Easy updates - just plug into your PC and drag-and-drop the latest software.
 
 You can view the project progress on my blog [here](https://ivanvnucec.github.io/tags/#catchcam)
