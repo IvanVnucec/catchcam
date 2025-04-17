@@ -54,11 +54,6 @@ struct cam_det_audio_wrn_task_params {
 
 static void sys_blink_task(__unused void *params)
 {
-    // Test system LEDs
-    leds_set_system_red_led(true);
-    sleep_ms(1000);
-    leds_set_system_red_led(false);
-
     while (true) {
         leds_set_system_green_led(true);
         sleep_ms(1000);
@@ -73,11 +68,6 @@ static void cam_det_led_wrn_task(void *params)
     struct cam_det_led_wrn_task_params *task_params = (struct cam_det_led_wrn_task_params *)params;
     QueueHandle_t wrn_data_queue = task_params->cam_det_led_wrn_data_queue;
     assert(wrn_data_queue);
-
-    // Test camera detected LED
-    leds_set_camera_detected_led(true);
-    sleep_ms(200);
-    leds_set_camera_detected_led(false);
 
     while (true) {
         struct cam_det_led_wrn_data cam_det_led_wrn_data;
