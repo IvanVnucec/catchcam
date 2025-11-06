@@ -36,11 +36,21 @@
             background-color: #f8f9fa;
             padding: 2rem 0;
         }
+
+        .device-image {
+            width: 100%;
+            max-width: 300px;
+            height: auto;
+            display: block;
+            margin: 1.5rem auto;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+        }
     </style>
 </head>
-
 <body>
     <main class="container mt-4">
+        
         <section id="about">
             <h1 class="text-center">Catchcam</h1>
             <h2 class="section-header">About</h2>
@@ -49,6 +59,9 @@
                 privacy. Unlike apps like Waze or Radarbot, Catchcam requires no internet connection and doesn’t track
                 your location. Simply plug it into your car’s USB port and drive.
             </p>
+            <img src="https://raw.githubusercontent.com/IvanVnucec/catchcam/refs/heads/master/docs/images/catchcam.jpg"
+                 alt="Catchcam device" 
+                 class="device-image">
             <p>
                 Key features include:
             <ul class="feature-list">
@@ -58,7 +71,6 @@
             </ul>
             </p>
         </section>
-
         <section id="how-it-works">
             <h2 class="section-header">How it Works</h2>
             <p>
@@ -79,7 +91,6 @@
                 <iframe src="https://www.youtube.com/embed/nnDtqLqS56w" title="Catchcam Demo" allowfullscreen></iframe>
             </div>
         </section>
-
         <section id="installation">
             <h2 class="section-header">Installation</h2>
             <p>
@@ -90,7 +101,6 @@
             </ol>
             </p>
         </section>
-
         <section id="device-update">
             <h2 class="section-header">Device Update</h2>
             <p>
@@ -108,7 +118,6 @@
             </ol>
             </p>
         </section>
-
         <section id="buy-now">
             <h2 class="section-header">Buy It Now</h2>
             <p>
@@ -116,19 +125,17 @@
                     href="mailto:vnucec.ivan@gmail.com">vnucec.ivan@gmail.com</a>.
             </p>
         </section>
-
         <section id="contribute">
             <h2 class="section-header">Contribute</h2>
             <p>Send your suggestions for improving the Catchcam device to <a
-                    href="mailto:vnucec.ivan@gmail.com">vnucec.ivan@gmail.com</a> or submit them directly via the <a
-                    href="https://github.com/IvanVnucec/catchcam" target="_blank">GitHub repository</a>.
+                href="mailto:vnucec.ivan@gmail.com">vnucec.ivan@gmail.com</a> or submit them directly via the <a
+                href="https://github.com/IvanVnucec/catchcam" target="_blank">GitHub repository</a>.
             </p>
             <p>You can also contribute cameras straight to <a href="https://www.openstreetmap.org/"
-                    target="_blank">OpenStreetMap</a> with this <a
-                    href="https://wiki.openstreetmap.org/wiki/Beginners%27_guide" target="_blank">guide</a>.</p>
+                target="_blank">OpenStreetMap</a> with this <a
+                href="https://wiki.openstreetmap.org/wiki/Beginners%27_guide" target="_blank">guide</a>.</p>
         </section>
     </main>
-
     <footer class="mt-5">
         <div class="container text-center">
             <p>Contact: <a href="mailto:vnucec.ivan@gmail.com">vnucec.ivan@gmail.com</a> | &copy; 2025 Catchcam | <a
@@ -137,10 +144,8 @@
                         style="height: 1em" loading="lazy" /></a></p>
         </div>
     </footer>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
 </body>
-
 </html>
