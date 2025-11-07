@@ -21,7 +21,7 @@
         }
 
         .feature-list li {
-            margin-bottom: 0.75rem;
+            margin-bottom: 0.5rem;
         }
 
         .navbar {
@@ -42,6 +42,59 @@
             border-radius: 10px;
             box-shadow: 0 3px 10px rgba(0,0,0,0.12);
         }
+
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            align-items: flex-start;
+        }
+
+        .col {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        /* Hide desktop image column on small screens */
+        .image-col-desktop {
+            display: none;
+        }
+
+        /* Show mobile image wrapper only on small screens */
+        .image-wrapper-mobile {
+            display: none;
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+
+        .image-wrapper-mobile img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        /* Tablet & Mobile */
+        @media (max-width: 768px) {
+            .image-col-desktop {
+                display: none !important;
+            }
+            .image-wrapper-mobile {
+                display: block !important;
+            }
+            .row {
+                flex-direction: column;
+            }
+        }
+
+        /* Desktop: show side-by-side, hide mobile image */
+        @media (min-width: 769px) {
+            .image-col-desktop {
+                display: block;
+            }
+            .image-wrapper-mobile {
+                display: none !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -57,6 +110,10 @@
                     <p>
                         Unlike apps like Waze or Radarbot, Catchcam requires no internet connection and doesn’t track your location. Simply plug it into your car’s USB port and drive.
                     </p>
+                    <!-- Image inserted here on small screens -->
+                    <div class="image-wrapper-mobile">
+                        <img src="https://raw.githubusercontent.com/IvanVnucec/catchcam/refs/heads/master/docs/images/catchcam.jpg" alt="Catchcam device" class="device-image">
+                    </div>
                     <p>
                         Key features include:
                         <ul class="feature-list">
@@ -66,7 +123,8 @@
                         </ul>
                     </p>
                 </div>
-                <div class="col">
+                <!-- Original image column (hidden on mobile) -->
+                <div class="col image-col-desktop">
                     <img src="https://raw.githubusercontent.com/IvanVnucec/catchcam/refs/heads/master/docs/images/catchcam.jpg" alt="Catchcam device" class="device-image">
                 </div>
             </div>
@@ -123,13 +181,13 @@
 
         <section id="contribute">
             <h2 class="section-header">Contribute</h2>
-            <h5>Camera Positions</h5>
+            <h6>Camera Positions</h6>
             <p>
                 The preferred way to contribute is by adding your suggestions directly to <a href="https://www.openstreetmap.org/"
                 target="_blank">OpenStreetMap</a> using this <a
                 href="https://wiki.openstreetmap.org/wiki/Beginners%27_guide" target="_blank">guide</a>. Once submitted, your camera positions will be reflected in the app image the very next day — just update your device to see the newly added cameras!
             </p>
-            <h5>Catchcam Device Improvements</h5>
+            <h6>Catchcam Device Improvements</h6>
             <p>
                 Submit your ideas to <a
                 href="mailto:vnucec.ivan@gmail.com">vnucec.ivan@gmail.com</a> or open an issue on the <a
