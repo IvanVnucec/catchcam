@@ -63,6 +63,10 @@
             box-shadow: 0 4px 12px var(--shadow);
         }
 
+        .card {
+            color: var(--text) !important;
+        }
+
         .section-header {
             color: #ffffff;
             border-bottom: 3px solid var(--primary);
@@ -271,6 +275,35 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #555;
         }
+
+        /* === FORCE EQUAL HEIGHT CARDS IN HOW-IT-WORKS === */
+        .how-it-works-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .how-it-works-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .how-it-works-grid > .card {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .how-it-works-grid .card-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .how-it-works-grid .card-text-bottom {
+            margin-top: auto;
+        }
     </style>
 </head>
 
@@ -352,33 +385,37 @@
         <!-- How It Works -->
         <section id="how-it-works" class="mt-5">
             <h2 class="section-header">How It Works</h2>
-            <div class="row">
-                <div class="col">
-                    <div class="ratio ratio-16x9" style="max-width: 820px; margin: 0 auto;">
+            <!-- GRID LAYOUT (replaces Bootstrap row/col) -->
+            <div class="how-it-works-grid">
+                <!-- LEFT CARD: Video + description -->
+                <div class="card p-4">
+                    <p class="mb-2 fw-bold">See Catchcam in action:</p>
+                    <div class="ratio ratio-16x9 mb-4">
                         <iframe src="https://www.youtube.com/embed/nnDtqLqS56w"
-                                title="Catchcam Demo Video - How it detects speed cameras offline"
+                                title="Catchcam Demo Video"
                                 allowfullscreen loading="lazy"></iframe>
                     </div>
+                    <div class="card-body p-0">
+                        <div class="card-text-bottom">
+                            <p class="mb-0">
+                                Catchcam uses a built-in GPS module to track your speed and position. It compares your location to a database of known speed cameras and <strong>alerts you with voice + LED</strong> when you're approaching one.
+                            </p>
+                        </div>
+                    </div>
                 </div>
-                <div class="col">
-                    <p>
-                        Catchcam uses a built-in GPS module to track your speed and position. It compares your location to a database of known speed cameras and <strong>alerts you with voice + LED</strong> when you're approaching one.
-                    </p>
-                    <p>
-                        The database is updated <strong>daily from OpenStreetMap</strong>, with ~50 new cameras added globally each day.
-                    </p>
-                    <!--
-                        <p>
-                            <strong>Explore coverage in your area:</strong>
-                        </p>
-                        <iframe class="osm-map"
-                        src="https://www.openstreetmap.org/export/embed.html?bbox=-15,30,45,65&layer=mapnik&marker=48.8566,2.3522"
-                        style="max-width:60%; height:300px;" frameborder="0">
-                    </iframe>
-                    <p class="mt-2">
-                        <small><a href="https://www.openstreetmap.org/#map=4/48.86/2.35" target="_blank">View full interactive map →</a></small>
-                    </p>
-                    -->
+                <!-- RIGHT CARD: Map + info -->
+                <div class="card p-4">
+                    <p class="mb-2 fw-bold">Explore coverage in your area:</p>
+                    <iframe class="osm-map w-100 mb-3"
+                            src="https://www.openstreetmap.org/export/embed.html?bbox=-15,30,45,65&layer=mapnik&marker=48.8566,2.3522"
+                            style="height:260px;" frameborder="0"></iframe>
+                    <div class="card-body p-0">
+                        <div class="card-text-bottom">
+                            <p class="mb-0">
+                                The database is updated <strong>daily from OpenStreetMap</strong>, with approximately 50 new cameras added globally each day.
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
