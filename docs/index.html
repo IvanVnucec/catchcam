@@ -5,43 +5,109 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Catchcam is a privacy-focused, offline speed camera detector that alerts drivers without tracking their location.">
-    <meta name="keywords" content="speed camera detector, Catchcam, offline GPS, privacy driving">
+    <meta name="keywords" content="speed camera detector, Catchcam, offline GPS, privacy driving, no tracking">
+
+    <!-- Open Graph / Social Sharing -->
     <meta property="og:title" content="Catchcam - Offline Speed Camera Detector">
-    <meta property="og:description" content="Discover Catchcam, the plug-and-play speed camera detector that prioritizes your privacy.">
-    <meta property="og:image" content="https://raw.githubusercontent.com/IvanVnucec/catchcam/refs/heads/master/docs/images/catchcam.jpg">
+    <meta property="og:description" content="No apps. No tracking. Just plug in and drive with confidence.">
+    <meta property="og:image" content="https://cdn.jsdelivr.net/gh/IvanVnucec/catchcam@master/docs/images/catchcam.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://ivanvnucec.github.io/catchcam/">
+
+    <meta name="twitter:card" content="summary_large_image">
+
     <title>Catchcam - Offline Speed Camera Detector</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link rel="icon" href="https://cdn.jsdelivr.net/gh/IvanVnucec/catchcam@master/docs/images/favicon.ico" type="image/x-icon">
+
+    <!-- Favicon -->
+    <link rel="icon" href="https://cdn.jsdelivr.net/gh/IvanVnucec/catchcam@master/docs/images/favicon.ico" type="image x-icon">
+    <link rel="apple-touch-icon" href="https://cdn.jsdelivr.net/gh/IvanVnucec/catchcam@master/docs/images/catchcam.jpg">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+    <!-- Preload Hero Image -->
+    <link rel="preload" href="https://cdn.jsdelivr.net/gh/IvanVnucec/catchcam@master/docs/images/catchcam.jpg" as="image">
 
     <style>
+        :root {
+            --bg: #222222;
+            --surface: #1a1a1a;
+            --text: #e0e0e0;
+            --text-muted: #aaaaaa;
+            --primary: #00aaff;
+            --success: #00d4aa;
+            --danger: #ff3b5c;
+            --border: #333333;
+            --shadow: rgba(0, 0, 0, 0.4);
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.7;
+        }
+
+        .container, .container-fluid {
+            background-color: var(--bg);
+        }
+
+        /* Cards & Surfaces */
+        .card, .pricing-card, .ratio {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
         .section-header {
-            color: #2c3e50;
-            border-bottom: 2px solid #3498db;
+            color: #ffffff;
+            border-bottom: 3px solid var(--primary);
             padding-bottom: 0.5rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.8rem;
+            font-weight: 600;
         }
 
         .feature-list li {
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.75rem;
+            position: relative;
+            padding-left: 1.5rem;
+            color: var(--text);
+            list-style-type: none;
         }
 
-        .navbar {
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        .feature-list li::before {
+            content: "✔️";
+            color: var(--success);
+            font-weight: bold;
+            position: absolute;
+            left: 0;
         }
 
         footer {
-            background-color: #f8f9fa;
-            padding: 2rem 0;
+            padding: 2.5rem 0;
+            font-size: 0.95rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+        }
+
+        footer a {
+            color: var(--primary);
         }
 
         .device-image {
             width: 100%;
-            max-width: 300px;
+            max-width: 320px;
             height: auto;
             display: block;
             margin: 1.5rem auto;
-            border-radius: 10px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+            transition: transform 0.3s ease;
+            border: 1px solid var(--border);
         }
 
         .row {
@@ -56,146 +122,319 @@
             min-width: 300px;
         }
 
-        /* Hide desktop image column on small screens */
+        /* Responsive Images */
         .image-col-desktop {
             display: none;
         }
 
-        /* Show mobile image wrapper only on small screens */
         .image-wrapper-mobile {
             display: none;
             text-align: center;
-            margin: 1.5rem 0;
+            margin: 2rem 0;
         }
 
         .image-wrapper-mobile img {
             max-width: 100%;
             height: auto;
-            border-radius: 8px;
+            border-radius: 10px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+            border: 1px solid var(--border);
         }
 
         /* Tablet & Mobile */
         @media (max-width: 768px) {
-            .image-col-desktop {
-                display: none !important;
-            }
-            .image-wrapper-mobile {
-                display: block !important;
-            }
-            .row {
-                flex-direction: column;
-            }
+            .image-col-desktop { display: none !important; }
+            .image-wrapper-mobile { display: block !important; }
+            .row { flex-direction: column; }
+            h1 { font-size: 2.3rem; }
         }
 
-        /* Desktop: show side-by-side, hide mobile image */
+        /* Desktop */
         @media (min-width: 769px) {
-            .image-col-desktop {
-                display: block;
-            }
-            .image-wrapper-mobile {
-                display: none !important;
-            }
+            .image-col-desktop { display: block; }
+            .image-wrapper-mobile { display: none !important; }
+        }
+
+        /* Trust Badges */
+        .trust-badges {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin: 2rem 0;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+        .trust-badges div {
+            text-align: center;
+        }
+
+        .trust-badges strong {
+            display: block;
+            font-size: 1.5rem;
+            color: #ffffff;
+        }
+
+        /* Pricing Card */
+        .pricing-card {
+            background: linear-gradient(135deg, #1e1e1e 0%, #252525 100%);
+            border-radius: 14px;
+            padding: 2.2rem;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+            margin: 2rem 0;
+            border: 1px solid var(--border);
+        }
+
+        .price {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--success);
+            text-shadow: 0 0 10px rgba(0, 212, 170, 0.3);
+        }
+
+        /* Buttons */
+        .btn-success {
+            background-color: var(--success);
+            border: none;
+            font-weight: 600;
+        }
+
+        .btn-success:hover {
+            background-color: #00b894;
+        }
+
+        .btn-outline-primary {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline-primary:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        /* Map */
+        .osm-map {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 1rem;
+            filter: brightness(0.9);
+        }
+
+        /* Links */
+        a {
+            color: var(--primary);
+            transition: color 0.2s;
+            text-decoration: none;
+        }
+
+        a:hover {
+            color: #1b6386 !important;
+            text-decoration: underline;
+        }
+
+        /* Text */
+        .lead {
+            color: #cccccc;
+        }
+
+        .text-muted {
+            color: var(--text-muted) !important;
+        }
+
+        /* Inputs & Forms */
+        code {
+            background: #2d2d2d;
+            color: #ff6b6b;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        /* Scrollbar (Webkit) */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
         }
     </style>
 </head>
+
 <body>
     <main class="container mt-4">
-        <h1 class="text-center">Catchcam</h1>
-        <section id="about">
-            <h2 class="section-header">About</h2>
+        <!-- Hero Section -->
+        <header class="text-center mb-5">
+            <h1 class="display-4" style="font-weight: 700; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">Catchcam</h1>
+            <p class="lead">Offline • No Tracking • Instant Speed Camera Alerts</p>
+
+            <div class="my-4 d-flex flex-column flex-sm-row gap-3 gap-sm-4 justify-content-center align-items-center">
+                <a href="mailto:vnucec.ivan@gmail.com?subject=Catchcam%20Order&body=Hi%2C%20I%27d%20like%20to%20order%20a%20Catchcam.%0A%0AName%3A%0AShipping%20Address%3A%0APayment%20Method%3A"
+                   class="btn btn-success btn-lg px-5 py-3 flex-fill flex-sm-grow-0"
+                   style="font-weight:600; box-shadow: 0 4px 15px rgba(0,212,170,0.3);">
+                    Buy Now – $79
+                </a>
+                <a href="#how-it-works" class="btn btn-outline-primary btn-lg flex-fill flex-sm-grow-0">
+                    Watch Demo
+                </a>
+            </div>
+
+            <p class="text-muted small">
+                Free worldwide shipping • Lifetime updates • 30-day returns
+            </p>
+        </header>
+
+        <!-- Trust Badges -->
+        <div class="trust-badges">
+            <div>
+                <strong>66,000+</strong>
+                <div>Speed Cameras</div>
+            </div>
+            <div>
+                <strong>Daily</strong>
+                <div>Database Updates</div>
+            </div>
+            <div>
+                <strong>No App</strong>
+                <div>No Subscription</div>
+            </div>
+        </div>
+
+        <!-- About -->
+        <section id="about" class="mt-5">
+            <h2 class="section-header">About Catchcam</h2>
             <div class="row">
                 <div class="col">
                     <p>
-                        Catchcam is a plug-and-play speed camera detector that operates entirely offline, ensuring complete privacy.
+                        Catchcam is a <strong>plug-and-play speed camera detector</strong> that works <strong>100% offline</strong> — no apps, no internet, no location tracking.
                     </p>
                     <p>
-                        Unlike apps like Waze or Radarbot, Catchcam requires no internet connection and doesn’t track your location. Simply plug it into your car’s USB port and drive.
+                        Just plug it into your car’s USB port and drive with peace of mind.
                     </p>
-                    <!-- Image inserted here on small screens -->
+
+                    <!-- Mobile Image -->
                     <div class="image-wrapper-mobile">
-                        <img src="https://cdn.jsdelivr.net/gh/IvanVnucec/catchcam@master/docs/images/catchcam.jpg" alt="Catchcam device" class="device-image">
+                        <img src="https://cdn.jsdelivr.net/gh/IvanVnucec/catchcam@master/docs/images/catchcam.jpg"
+                             alt="Catchcam device - compact offline speed camera detector" class="device-image">
                     </div>
-                    <p>
-                        Key features include:
-                        <ul class="feature-list">
-                            <li>Built-in speaker and LED's for real-time alerts</li>
-                            <li>Preloaded with 66,000+ global speed camera locations, with new ones added daily</li>
-                            <li>Easy updates - just plug into your PC and drag-and-drop the latest software.</li>
-                        </ul>
-                    </p>
+
+                    <p><strong>Key Features:</strong></p>
+                    <ul class="feature-list">
+                        <li>Built-in speaker + flashing LEDs for real-time alerts</li>
+                        <li>Preloaded with <strong>66,000+ global speed cameras</strong></li>
+                        <li>Updated daily from OpenStreetMap</li>
+                        <li>Easy drag-and-drop updates via USB</li>
+                        <li>No data collection — your privacy is guaranteed</li>
+                    </ul>
                 </div>
-                <!-- Original image column (hidden on mobile) -->
+
+                <!-- Desktop Image -->
                 <div class="col image-col-desktop">
-                    <img src="https://cdn.jsdelivr.net/gh/IvanVnucec/catchcam@master/docs/images/catchcam.jpg" alt="Catchcam device" class="device-image">
+                    <img src="https://cdn.jsdelivr.net/gh/IvanVnucec/catchcam@master/docs/images/catchcam.jpg"
+                         alt="Catchcam device" class="device-image">
                 </div>
             </div>
         </section>
 
-        <section id="how-it-works">
-            <h2 class="section-header">How it Works</h2>
+        <!-- How It Works -->
+        <section id="how-it-works" class="mt-5">
+            <h2 class="section-header">How It Works</h2>
             <div class="row">
                 <div class="col">
                     <div class="ratio ratio-16x9" style="max-width: 820px; margin: 0 auto;">
-                        <iframe src="https://www.youtube.com/embed/nnDtqLqS56w" title="Catchcam demo video" allowfullscreen></iframe>
+                        <iframe src="https://www.youtube.com/embed/nnDtqLqS56w"
+                                title="Catchcam Demo Video - How it detects speed cameras offline"
+                                allowfullscreen loading="lazy"></iframe>
                     </div>
                 </div>
                 <div class="col">
                     <p>
-                        Catchcam's built-in GPS module tracks your speed and location, comparing your position to a database of known speed camera locations. When approaching a camera, Catchcam provides a voice alert with the speed limit and a flashing LED.
+                        Catchcam uses a built-in GPS module to track your speed and position. It compares your location to a database of known speed cameras and <strong>alerts you with voice + LED</strong> when you're approaching one.
                     </p>
                     <p>
-                        The speed camera database is updated daily from <a href="https://www.openstreetmap.org/" target="_blank">OpenStreetMap</a>, with approximately 50 new cameras added each day. Explore the map below to view coverage in your area.
-                        <!-- TODO: add map -->
+                        The database is updated <strong>daily from OpenStreetMap</strong>, with ~50 new cameras added globally each day.
+                    </p>
+                    <p>
+                        <strong>Explore coverage in your area:</strong>
+                    </p>
+                    <iframe class="osm-map"
+                            src="https://www.openstreetmap.org/export/embed.html?bbox=-15,30,45,65&layer=mapnik&marker=48.8566,2.3522"
+                            style="max-width:60%; height:300px;" frameborder="0">
+                    </iframe>
+                    <p class="mt-2">
+                        <small><a href="https://www.openstreetmap.org/#map=4/48.86/2.35" target="_blank">View full interactive map →</a></small>
                     </p>
                 </div>
             </div>
         </section>
 
-        <section id="installation">
-            <h2 class="section-header">Installation</h2>
-            <ol>
-                <li>Connect Catchcam to your car’s USB socket using a USB-C cable.</li>
-                <li>Place Catchcam on the windshield dashboard with the top side facing up, or position it conveniently on a seat or elsewhere.</li>
+        <!-- Installation -->
+        <section id="installation" class="mt-5">
+            <h2 class="section-header">Installation (30 Seconds)</h2>
+            <ol class="fs-5">
+                <li>Plug Catchcam into your car’s <strong>USB-C port</strong>.</li>
+                <li>Place it on the dashboard (top side up) or anywhere convenient.</li>
+                <li>Drive — it starts working immediately!</li>
             </ol>
         </section>
 
-        <section id="device-update">
-            <h2 class="section-header">Device Update</h2>
-            <p>
-                Updating Catchcam with the latest speed camera database is as easy as using a USB thumb drive:
-                <ol>
-                    <li>Download the latest <a href="https://github.com/IvanVnucec/catchcam/releases/download/master/catchcam.uf2" target="_self">catchcam.uf2</a> file.</li>
-                    <li>Connect one end of a USB-C cable to your PC.</li>
-                    <li>Press and hold the Update button on the right side of the device (use a paperclip or toothpick) while connecting the other end of the USB-C cable.</li>
-                    <li>The device will appear as a USB thumb drive in your file explorer.</li>
-                    <li>Drag and drop the downloaded <code>catchcam.uf2</code> file to the device and wait for it to restart (10-30 seconds).</li>
-                </ol>
-            </p>
+        <!-- Device Update -->
+        <section id="device-update" class="mt-5">
+            <h2 class="section-header">Update Device (Like a USB Drive)</h2>
+            <ol class="fs-5">
+                <li>Download the latest <a href="https://github.com/IvanVnucec/catchcam/releases/download/master/catchcam.uf2" target="_blank"><code>catchcam.uf2</code></a></li>
+                <li>Hold the <strong>Update button</strong> (right side) with a paperclip</li>
+                <li>Plug into your PC — it appears as a USB drive</li>
+                <li>Drag & drop the <code>.uf2</code> file</li>
+                <li>Wait 15–30 seconds — device restarts with new data</li>
+            </ol>
         </section>
 
-        <section id="buy-now">
-            <h2 class="section-header">Buy It Now</h2>
-            <div class="text-center p-4">
-                <h3>Catchcam — <strong>€79</strong></h3>
-                <p class="text-muted mb-3">One-time purchase • Free lifetime updates • Ships worldwide</p>
-                <a href="mailto:vnucec.ivan@gmail.com?subject=Catchcam%20Order..." class="btn btn-success btn-lg">Order Now →</a>
+        <!-- Pricing & Buy -->
+        <section id="buy-now" class="mt-5">
+            <h2 class="section-header text-center">Get Yours Today</h2>
+            <div class="pricing-card">
+                <h3>Catchcam Device</h3>
+                <div class="price">$79</div>
+                <p class="text-muted mb-3">One-time purchase • Free lifetime updates</p>
+                <a href="mailto:vnucec.ivan@gmail.com?subject=Catchcam%20Order&body=Hi%2C%20I%27d%20like%20to%20order%20a%20Catchcam.%0A%0AName%3A%0AShipping%20Address%3A%0APayment%20Method%3A"
+                   class="btn btn-success btn-lg px-5">Order via Email →</a>
+                <p class="mt-3 small text-muted">
+                    PayPal • Bank • Crypto • Ships in 2–5 days
+                </p>
             </div>
         </section>
 
-        <section id="contribute">
-            <h2 class="section-header">Contribute</h2>
-            <h6>Camera Positions</h6>
-            <p>
-                The preferred way to contribute is by adding your suggestions directly to <a href="https://www.openstreetmap.org/"
-                target="_blank">OpenStreetMap</a> using this <a
-                href="https://wiki.openstreetmap.org/wiki/Beginners%27_guide" target="_blank">guide</a>. Once submitted, your camera positions will be reflected in the app image the very next day — just update your device to see the newly added cameras!
-            </p>
-            <h6>Catchcam Device Improvements</h6>
-            <p>
-                Submit your ideas to <a
-                href="mailto:vnucec.ivan@gmail.com">vnucec.ivan@gmail.com</a> or open an issue on the <a
-                href="https://github.com/IvanVnucec/catchcam" target="_blank">GitHub repository</a> repository.
-            </p>
+        <!-- Contribute -->
+        <section id="contribute" class="mt-5">
+            <h2 class="section-header">Help Improve Catchcam</h2>
+            <div class="row">
+                <div class="col">
+                    <h6 class="font-weight-bold">Add Camera Locations</h6>
+                    <p>
+                        Add speed cameras directly to <a href="https://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> using this <a href="https://wiki.openstreetmap.org/wiki/Beginners%27_guide" target="_blank">beginner’s guide</a>. Your submission appears in Catchcam <strong>the next day</strong>.
+                    </p>
+                </div>
+                <div class="col">
+                    <h6>Suggest Features</h6>
+                    <p>
+                        Email ideas to <a href="mailto:vnucec.ivan@gmail.com">vnucec.ivan@gmail.com</a> or open an issue on <a href="https://github.com/IvanVnucec/catchcam" target="_blank">GitHub</a>.
+                    </p>
+                </div>
+            </div>
         </section>
     </main>
 
@@ -207,12 +446,14 @@
                 &copy; 2025 Catchcam
                 <span class="mx-2 text-muted">•</span>
                 <a title="Stats" href="https://librecounter.org/referer/show" target="_blank">
-                    <img src="https://librecounter.org/counter.svg" referrerpolicy="unsafe-url" alt="librecounter" style="height: 1em" loading="lazy"/>
+                    <img src="https://librecounter.org/counter.svg" referrerpolicy="unsafe-url" alt="Visitor counter" style="height: 1em"/>
                 </a>
             </p>
         </div>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>
