@@ -33,15 +33,17 @@
 
     <style>
         :root {
-            --bg: #222222;
-            --surface: #1a1a1a;
-            --text: #e0e0e0;
-            --text-muted: #aaaaaa;
-            --primary: #00aaff;
-            --success: #00d4aa;
-            --danger: #ff3b5c;
-            --border: #333333;
-            --shadow: rgba(0, 0, 0, 0.4);
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --border: #334155;
+            --shadow: rgba(0, 0, 0, 0.3);
+
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+
+            --primary: #38bdf8;
+            --success: #34d399;
+            --danger: #f87171;
         }
 
         body {
@@ -51,12 +53,15 @@
             line-height: 1.7;
         }
 
-        .container, .container-fluid {
+        .container,
+        .container-fluid {
             background-color: var(--bg);
         }
 
         /* Cards & Surfaces */
-        .card, .pricing-card, .ratio {
+        .card,
+        .pricing-card,
+        .ratio {
             background-color: var(--surface);
             border: 1px solid var(--border);
             border-radius: 12px;
@@ -109,7 +114,7 @@
             display: block;
             margin: 1.5rem auto;
             border-radius: 12px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, .5);
             transition: transform 0.3s ease;
             border: 1px solid var(--border);
         }
@@ -141,25 +146,40 @@
             max-width: 100%;
             height: auto;
             border-radius: 10px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, .5);
             border: 1px solid var(--border);
         }
 
         /* Tablet & Mobile */
-        @media (max-width: 768px) {
-            .image-col-desktop { display: none !important; }
-            .image-wrapper-mobile { display: block !important; }
-            .row { flex-direction: column; }
-            h1 { font-size: 2.3rem; }
+        @media (max-width:768px) {
+            .image-col-desktop {
+                display: none !important;
+            }
+
+            .image-wrapper-mobile {
+                display: block !important;
+            }
+
+            .row {
+                flex-direction: column;
+            }
+
+            h1 {
+                font-size: 2.3rem;
+            }
         }
 
         /* Desktop */
-        @media (min-width: 769px) {
-            .image-col-desktop { display: block; }
-            .image-wrapper-mobile { display: none !important; }
+        @media (min-width:769px) {
+            .image-col-desktop {
+                display: block;
+            }
+
+            .image-wrapper-mobile {
+                display: none !important;
+            }
         }
 
-        /* Trust Badges */
         .trust-badges {
             display: flex;
             justify-content: center;
@@ -180,13 +200,12 @@
             color: #ffffff;
         }
 
-        /* Pricing Card */
         .pricing-card {
-            background: linear-gradient(135deg, #1e1e1e 0%, #252525 100%);
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
             border-radius: 14px;
             padding: 2.2rem;
             text-align: center;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
             margin: 2rem 0;
             border: 1px solid var(--border);
         }
@@ -195,10 +214,9 @@
             font-size: 3rem;
             font-weight: 700;
             color: var(--success);
-            text-shadow: 0 0 10px rgba(0, 212, 170, 0.3);
+            text-shadow: 0 0 10px rgba(52, 211, 153, 0.3);
         }
 
-        /* Buttons */
         .btn-success {
             background-color: var(--success);
             border: none;
@@ -206,7 +224,7 @@
         }
 
         .btn-success:hover {
-            background-color: #00b894;
+            background-color: #10b981;
         }
 
         .btn-outline-primary {
@@ -216,10 +234,9 @@
 
         .btn-outline-primary:hover {
             background-color: var(--primary);
-            color: white;
+            color: #ffffff;
         }
 
-        /* Map */
         .osm-map {
             border: 1px solid var(--border);
             border-radius: 10px;
@@ -228,7 +245,6 @@
             filter: brightness(0.9);
         }
 
-        /* Links */
         a {
             color: var(--primary);
             transition: color 0.2s;
@@ -236,29 +252,26 @@
         }
 
         a:hover {
-            color: #1b6386 !important;
+            color: #0ea5e9 !important;
             text-decoration: underline;
         }
 
-        /* Text */
         .lead {
-            color: #cccccc;
+            color: #cbd5e1;
         }
 
         .text-muted {
             color: var(--text-muted) !important;
         }
 
-        /* Inputs & Forms */
         code {
-            background: #2d2d2d;
-            color: #ff6b6b;
+            background: #334155;
+            color: #fba7a7;
             padding: 0.2rem 0.4rem;
             border-radius: 4px;
             font-size: 0.9em;
         }
 
-        /* Scrollbar (Webkit) */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -268,28 +281,28 @@
         }
 
         ::-webkit-scrollbar-thumb {
-            background: #444;
+            background: #475569;
             border-radius: 4px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: #555;
+            background: #64748b;
         }
 
-        /* === FORCE EQUAL HEIGHT CARDS IN HOW-IT-WORKS === */
+        /* Equal height cards */
         .how-it-works-grid {
             display: grid;
             grid-template-columns: 1fr;
             gap: 2rem;
         }
 
-        @media (min-width: 768px) {
+        @media (min-width:768px) {
             .how-it-works-grid {
                 grid-template-columns: 1fr 1fr;
             }
         }
 
-        .how-it-works-grid > .card {
+        .how-it-works-grid>.card {
             display: flex;
             flex-direction: column;
             height: 100%;
