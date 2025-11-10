@@ -83,18 +83,25 @@
         .feature-list li {
             margin-bottom: 0.75rem;
             position: relative;
-            padding-left: 1.5rem;
+            padding-left: 2.2rem; /* Increased for emoji space */
             color: var(--text);
             list-style-type: none;
+            font-size: 1.05rem;
         }
 
         .feature-list li::before {
-            content: "✔️";
-            color: var(--success);
-            font-weight: bold;
             position: absolute;
             left: 0;
+            top: 0.1em;
+            font-size: 1.3em;
+            line-height: 1;
         }
+
+        .feature-list li:nth-child(1)::before { content: "🔊"; }
+        .feature-list li:nth-child(2)::before { content: "📍"; }
+        .feature-list li:nth-child(3)::before { content: "🔁"; }
+        .feature-list li:nth-child(4)::before { content: "💾"; }
+        .feature-list li:nth-child(5)::before { content: "🛡️"; }
 
         footer {
             padding: 2.5rem 0;
@@ -317,6 +324,13 @@
         .how-it-works-grid .card-text-bottom {
             margin-top: auto;
         }
+
+        .subheader {
+            font-size: 1.1rem;
+            font-weight: 600 !important;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.4rem;
+        }
     </style>
 </head>
 
@@ -450,7 +464,7 @@
                 <li>Download the latest <a href="https://github.com/IvanVnucec/catchcam/releases/download/master/catchcam.uf2" target="_blank"><code>catchcam.uf2</code></a></li>
                 <li>Hold the <strong>Update button</strong> (right side) with a paperclip</li>
                 <li>Plug into your PC — it appears as a USB drive</li>
-                <li>Drag & drop the <code>.uf2</code> file</li>
+                <li>Drag & drop the <code>catchcam.uf2</code> file</li>
                 <li>Wait 15–30 seconds — device restarts with new data</li>
             </ol>
         </section>
@@ -465,7 +479,7 @@
                 <a href="mailto:vnucec.ivan@gmail.com?subject=Catchcam%20Order&body=Hi%2C%20I%27d%20like%20to%20order%20a%20Catchcam.%0A%0AName%3A%0AShipping%20Address%3A%0APayment%20Method%3A"
                    class="btn btn-success btn-lg px-5">Order via Email →</a>
                 <p class="mt-3 small text-muted">
-                    PayPal • Bank • Crypto • Ships in 2–5 days
+                    PayPal • Bank • Ships in 2–5 days
                 </p>
             </div>
         </section>
@@ -475,13 +489,13 @@
             <h2 class="section-header">Help Improve Catchcam</h2>
             <div class="row">
                 <div class="col">
-                    <h6 class="font-weight-bold">Add Camera Locations</h6>
+                    <h6 class="subheader">Add Camera Locations</h6>
                     <p>
                         Add speed cameras directly to <a href="https://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> using this <a href="https://wiki.openstreetmap.org/wiki/Beginners%27_guide" target="_blank">beginner’s guide</a>. Your submission appears in Catchcam <strong>the next day</strong>.
                     </p>
                 </div>
                 <div class="col">
-                    <h6>Suggest Features</h6>
+                    <h6 class="subheader">Suggest Features</h6>
                     <p>
                         Email ideas to <a href="mailto:vnucec.ivan@gmail.com">vnucec.ivan@gmail.com</a> or open an issue on <a href="https://github.com/IvanVnucec/catchcam" target="_blank">GitHub</a>.
                     </p>
