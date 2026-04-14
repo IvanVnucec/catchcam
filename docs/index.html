@@ -28,6 +28,10 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 
+    <!-- MapLibre GL JS -->
+    <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.23.0/dist/maplibre-gl.css" />
+    <script src="https://unpkg.com/maplibre-gl@5.23.0/dist/maplibre-gl.js"></script>
+
     <!-- Preload Hero Image -->
     <link rel="preload" href="https://cdn.jsdelivr.net/gh/IvanVnucec/catchcam@master/docs/images/catchcam.jpg" as="image">
 
@@ -332,6 +336,14 @@
             margin-bottom: 0.75rem;
             padding-bottom: 0.4rem;
         }
+
+        /* Map specific styles */
+        #catchcam-map {
+            width: 100%;
+            height: 320px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
     </style>
 </head>
 
@@ -361,7 +373,7 @@
         <!-- Trust Badges -->
         <div class="trust-badges">
             <div>
-                <strong>66,000+</strong>
+                <strong>70,000+</strong>
                 <div>Speed Cameras</div>
             </div>
             <div>
@@ -395,7 +407,7 @@
                     <p><strong>Key Features:</strong></p>
                     <ul class="feature-list">
                         <li>Built-in speaker + flashing LEDs for real-time alerts</li>
-                        <li>Preloaded with <strong>66,000+ global speed cameras</strong></li>
+                        <li>Preloaded with <strong>70,000+ global speed cameras</strong></li>
                         <li>Updated daily from OpenStreetMap</li>
                         <li>Easy drag-and-drop updates via USB</li>
                         <li>No data collection — your privacy is guaranteed</li>
@@ -413,7 +425,7 @@
         <!-- How It Works -->
         <section id="how-it-works" class="mt-5">
             <h2 class="section-header">How It Works</h2>
-            <!-- GRID LAYOUT (replaces Bootstrap row/col) -->
+            <!-- GRID LAYOUT -->
             <div class="how-it-works-grid">
                 <!-- LEFT CARD: Video + description -->
                 <div class="card p-4">
@@ -431,16 +443,15 @@
                         </div>
                     </div>
                 </div>
-                <!-- RIGHT CARD: Map + info -->
+
+                <!-- RIGHT CARD: Interactive Map -->
                 <div class="card p-4">
-                    <p class="mb-2 fw-bold">Explore coverage in your area:</p>
-                    <iframe class="osm-map w-100 mb-3"
-                            src="https://www.openstreetmap.org/export/embed.html?bbox=-15,30,45,65&layer=mapnik&marker=48.8566,2.3522"
-                            style="height:260px;" frameborder="0"></iframe>
-                    <div class="card-body p-0">
+                    <p class="mb-2 fw-bold">Explore 70,000+ speed cameras worldwide:</p>
+                    <div id="catchcam-map" class="osm-map"></div>
+                    <div class="card-body p-0 mt-3">
                         <div class="card-text-bottom">
                             <p class="mb-0">
-                                The database is updated <strong>daily from OpenStreetMap</strong>, with approximately 50 new cameras added globally each day.
+                                The database is updated <strong>daily from OpenStreetMap</strong>. Zoom in to see individual cameras (red dots). New cameras appear in Catchcam the next day.
                             </p>
                         </div>
                     </div>
@@ -522,5 +533,88 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <!-- Camera data -->
+    <script src="cams_list.js"></script>
+
+    <!-- Interactive Map Script -->
+    <script>
+        window.addEventListener('load', () => {
+            const mapContainer = document.getElementById('catchcam-map');
+
+            if (!mapContainer || typeof cams_list === 'undefined') {
+                console.warn('Map container or cams_list not found.');
+                return;
+            }
+
+            const camerasGeoJSON = {
+                type: "FeatureCollection",
+                features: cams_list.map((cam, index) => ({
+                    type: "Feature",
+                    geometry: {
+                        type: "Point",
+                        coordinates: [cam.lng, cam.lat]
+                    },
+                    properties: {
+                        id: index + 1
+                    }
+                }))
+            };
+
+            const map = new maplibregl.Map({
+                container: 'catchcam-map',
+                style: {
+                    version: 8,
+                    sources: {
+                        'osm': {
+                            type: 'raster',
+                            tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+                            tileSize: 256,
+                            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                        }
+                    },
+                    layers: [{
+                        id: 'osm',
+                        type: 'raster',
+                        source: 'osm'
+                    }]
+                },
+                center: [15, 52],   // Centered on Europe
+                zoom: 1.0,
+                maxZoom: 19,
+                minZoom: 1
+            });
+
+            map.on('load', () => {
+                // Add source
+                map.addSource('points', {
+                    type: 'geojson',
+                    data: camerasGeoJSON
+                });
+
+                // Add circle layer
+                map.addLayer({
+                    id: 'points-layer',
+                    type: 'circle',
+                    source: 'points',
+                    paint: {
+                        'circle-radius': [
+                            'interpolate',
+                            ['linear'],
+                            ['zoom'],
+                            3,  1.5,     // bigger when zoomed out
+                            8,  4,       // medium zoom
+                            14, 6,       // close zoom
+                            18, 9        // very zoomed in
+                        ],
+                        'circle-color': 'red',
+                    }
+                });
+            });
+
+            // Optional: Make map resize nicely if window changes
+            window.addEventListener('resize', () => map.resize());
+        });
+    </script>
 </body>
 </html>

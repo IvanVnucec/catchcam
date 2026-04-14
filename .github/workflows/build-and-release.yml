@@ -39,7 +39,7 @@ jobs:
 
     - name: Update camera list
       if: github.event_name == 'schedule'
-      run: python3 ${{github.workspace}}/catchcam/scripts/fetch_cameras/fetch.py ${{github.workspace}}/catchcam/src/cams/cams_list.h
+      run: python3 ${{github.workspace}}/catchcam/scripts/fetch_cameras/fetch.py ${{github.workspace}}/catchcam/src/cams/cams_list.h ${{github.workspace}}/catchcam/docs/cams_list.js
 
     - name: Create Build Environment
       working-directory: ${{github.workspace}}/catchcam
