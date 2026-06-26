@@ -6,7 +6,7 @@ import json
 
 def get_speed_cameras_from_overpass_api():
     # Faster public instance (recommended for large queries)
-    overpass_url = "https://overpass.kumi.systems/api/interpreter"
+    overpass_url = "http://overpass-api.de/api/interpreter"
     overpass_query = """[out:json][timeout:900];
 node["highway"="speed_camera"];
 out geom;
@@ -17,7 +17,7 @@ out geom;
         data=data,
         method='POST',
         headers={
-            'User-Agent': 'CatchCam-fetch-script[](https://github.com/yourusername/catchcam)',
+            'User-Agent': 'Catchcam-fetch-script[](https://github.com/IvanVnucec/catchcam)',
             'Accept': 'application/json',
             'Content-Type': 'application/x-www-form-urlencoded',
         }
