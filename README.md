@@ -25,6 +25,10 @@ Catchcam uses a GPS module to determine your speed and position. It then compare
 
 Speed camera database is updated regularly from the [OpenStreetMap](https://www.openstreetmap.org/).
 
+### See it in action
+
+[![ Catchcam - Speed Camera Detector ](https://img.youtube.com/vi/nnDtqLqS56w/0.jpg)](https://www.youtube.com/watch?v=nnDtqLqS56w)
+
 ## How to update the device
 
 To update the device, first you need to download the latest software from the [releases](https://github.com/IvanVnucec/catchcam/releases) page.
