@@ -54,6 +54,7 @@ struct cam_det_audio_wrn_task_params {
 
 static void sys_blink_task(__unused void *params)
 {
+    leds_set_system_red_led(false);
     while (true) {
         leds_set_system_green_led(true);
         sleep_ms(1000);
@@ -235,15 +236,15 @@ static void main_task(__unused void *params)
         struct gnss_data gnss_data;
         xQueueReceive(gnss_data_queue, &gnss_data, portMAX_DELAY);
 
-        printf("GNSS data: valid=%d, speed=%.2f kmph, course=%.2f deg, lat=%.6f, lon=%.6f\n",
-               gnss_data.valid, KNOTS_TO_KMPH(gnss_data.speed_knots), gnss_data.course_deg, gnss_data.pos.lat, gnss_data.pos.lon);
-
         if (gnss_data.valid == false) {
             // Clear camera detection warning
             last_camera = NULL;
             last_distance_squared_in_meters = FLT_MAX;
             continue;
         }
+
+        printf("GNSS data: valid=%d, speed=%.2f kmph, course=%.2f deg, lat=%.6f, lon=%.6f\n",
+               gnss_data.valid, KNOTS_TO_KMPH(gnss_data.speed_knots), gnss_data.course_deg, gnss_data.pos.lat, gnss_data.pos.lon);
 
         // Get nearest camera
         const struct cams_camera_info *camera;
@@ -314,6 +315,9 @@ static void vLaunch(void)
 int main(void)
 {
     leds_init();
+    leds_set_system_red_led(true);
+    leds_set_gnss_fix_leds_state(false);
+
     stdio_init_all();
 
     vLaunch();

@@ -130,11 +130,6 @@ void gnss_task(void *params)
     struct gnss_data gnss_data = {0};
     bool gnss_fix_acquired_played = false;
 
-    // Test GNSS LEDs
-    leds_set_gnss_fix_leds_state(true);
-    sleep_ms(1000);
-    leds_set_gnss_fix_leds_state(false);
-
     gnss_nmea_stream_buff = xStreamBufferCreate(1024, 1);
     assert(gnss_nmea_stream_buff);
 
