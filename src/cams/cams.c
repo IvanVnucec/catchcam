@@ -5,11 +5,12 @@
 #include "cams_list.h"
 #include "gnss/gnss.h"
 
-void cams_get_nearest_camera(const struct cams_camera_info **cam, const struct gnss_position *pos, float lon_scale_squared)
+float cams_get_nearest_camera(const struct cams_camera_info **cam, const struct gnss_position *pos, float lon_scale_squared)
 {
     assert(cam);
     assert(pos);
 
+    *cam = NULL;
     float min_dist = FLT_MAX;
 
     for (size_t i=0; i<cams_list_length; i++) {
@@ -19,4 +20,6 @@ void cams_get_nearest_camera(const struct cams_camera_info **cam, const struct g
             *cam = &cams_list[i];
         }
     }
+
+    return min_dist;
 }

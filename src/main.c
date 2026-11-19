@@ -248,14 +248,13 @@ static void main_task(__unused void *params)
 
         // Get nearest camera
         const struct cams_camera_info *camera = NULL;
-        cams_get_nearest_camera(&camera, &gnss_data.pos, gnss_data.lon_scale_squared);
+        float distance_squared_in_meters = cams_get_nearest_camera(&camera, &gnss_data.pos, gnss_data.lon_scale_squared);
         if (camera == NULL) {
             continue;
         }
 
         printf("Nearest camera: lat=%.6f, lon=%.6f, limit=%d\n", camera->pos.lat, camera->pos.lon, camera->limit);
 
-        float distance_squared_in_meters = GNSS_DISTANCE_SQUARED_IN_METERS(gnss_data.pos, camera->pos, gnss_data.lon_scale_squared);
         printf("Distance: %.2f m\n", sqrtf(distance_squared_in_meters));
 
         // Check if we are close to a camera
