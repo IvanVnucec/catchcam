@@ -247,7 +247,7 @@ static void main_task(__unused void *params)
                gnss_data.valid, KNOTS_TO_KMPH(gnss_data.speed_knots), gnss_data.course_deg, gnss_data.pos.lat, gnss_data.pos.lon);
 
         // Get nearest camera
-        const struct cams_camera_info *camera = NULL;
+        const struct cams_camera_info *camera;
         float distance_squared_in_meters = cams_get_nearest_camera(&camera, &gnss_data.pos, gnss_data.lon_scale_squared);
         if (camera == NULL) {
             continue;
