@@ -70,13 +70,13 @@ static bool gnss_nmea_parse_sentence(struct gnss_data *gnss_data, const char *se
         case MINMEA_SENTENCE_RMC: {
             struct minmea_sentence_rmc frame;
             if (minmea_parse_rmc(&frame, sentence)) {
-                // TODO: see if valid is the right field to use
-                gnss_data->valid = frame.valid;
                 // TODO: handle NaN values
                 gnss_data->speed_knots = minmea_tofloat(&frame.speed);
                 gnss_data->course_deg = minmea_tofloat(&frame.course);
                 gnss_data->pos.lat = minmea_tocoord(&frame.latitude);
                 gnss_data->pos.lon = minmea_tocoord(&frame.longitude);
+                // TODO: see if valid is the right field to use
+                gnss_data->valid = frame.valid && !isnan(gnss_data->pos.lat) && !isnan(gnss_data->pos.lon);
                 float lon_scale = cosf(DEG_TO_RAD(gnss_data->pos.lat));
                 gnss_data->lon_scale_squared = lon_scale * lon_scale;
                 return true;
