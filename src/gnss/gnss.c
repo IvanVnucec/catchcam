@@ -1,6 +1,7 @@
 #include <stdbool.h>
 #include <assert.h>
 #include <stdio.h>
+#include <math.h>
 
 #include <pico/stdlib.h>
 #include <hardware/gpio.h>
@@ -20,6 +21,8 @@
 #define DATA_BITS        8
 #define STOP_BITS        1
 #define PARITY           UART_PARITY_NONE
+
+#define DEG_TO_RAD(deg)  ((deg) * 0.017453292519943295f)
 
 static StreamBufferHandle_t gnss_nmea_stream_buff;
 
@@ -74,6 +77,8 @@ static bool gnss_nmea_parse_sentence(struct gnss_data *gnss_data, const char *se
                 gnss_data->course_deg = minmea_tofloat(&frame.course);
                 gnss_data->pos.lat = minmea_tocoord(&frame.latitude);
                 gnss_data->pos.lon = minmea_tocoord(&frame.longitude);
+                float lon_scale = cosf(DEG_TO_RAD(gnss_data->pos.lat));
+                gnss_data->lon_scale_squared = lon_scale * lon_scale;
                 return true;
             }
         } break;

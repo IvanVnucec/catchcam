@@ -10,4 +10,4 @@ struct __packed cams_camera_info {
     uint8_t limit;
 };
 
-void cams_get_nearest_camera(const struct cams_camera_info **cam, const struct gnss_position *pos);
+void cams_get_nearest_camera(const struct cams_camera_info **cam, const struct gnss_position *pos, float lon_scale_squared);
