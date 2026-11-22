@@ -1,8 +1,58 @@
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 import urllib.request
 import urllib.parse
 import json
+
+USER_AGENT = 'Catchcam-fetch-script[](https://github.com/IvanVnucec/catchcam)'
+
+# San Francisco speed cameras (SFMTA Speed Safety Camera program) from DataSF.
+# Most of them are missing from OpenStreetMap. Dataset license: PDDL (public domain).
+# The dataset holds daily warning/citation counts, one row per camera per day.
+SF_DATASET_ID = "d5uh-bk84"
+SF_DATASET_URL = f"https://data.sf.gov/resource/{SF_DATASET_ID}.json"
+# A camera counts as active if it reported within this many days of the newest
+# record in the dataset. This drops positions of cameras that were relocated.
+SF_ACTIVE_WINDOW_DAYS = 60
+
+def query_datasf(params):
+    url = SF_DATASET_URL + '?' + urllib.parse.urlencode(params)
+    req = urllib.request.Request(url, headers={'User-Agent': USER_AGENT, 'Accept': 'application/json'})
+    with urllib.request.urlopen(req, timeout=120) as response:
+        return json.loads(response.read())
+
+def get_sf_cameras():
+    where = "enforcement_type = 'FIXED SPEED' AND latitude IS NOT NULL AND longitude IS NOT NULL"
+    latest = query_datasf({'$select': 'max(date) AS latest', '$where': where})[0].get('latest')
+    if not latest:
+        raise RuntimeError("DataSF returned no San Francisco speed cameras")
+    cutoff = datetime.strptime(latest[:10], '%Y-%m-%d') - timedelta(days=SF_ACTIVE_WINDOW_DAYS)
+    fields = 'site_id, location, latitude, longitude, posted_speed'
+    rows = query_datasf({
+        '$select': f'{fields}, max(date) AS last_seen',
+        '$where': f"{where} AND date >= '{cutoff:%Y-%m-%dT%H:%M:%S}'",
+        '$group': fields,
+        '$limit': 50000,
+    })
+    # Keep one entry per camera position, using its most recent speed limit
+    newest = {}
+    for r in rows:
+        key = (r['site_id'], r['latitude'], r['longitude'])
+        if key not in newest or r['last_seen'] > newest[key]['last_seen']:
+            newest[key] = r
+    cameras = []
+    for r in newest.values():
+        location = ' '.join(r.get('location', '').split())
+        cameras.append({
+            'lat': float(r['latitude']),
+            'lon': float(r['longitude']),
+            'limit': int(float(r.get('posted_speed') or 0)),
+            'ref': f"https://data.sf.gov/d/{SF_DATASET_ID} {r['site_id']} {location}",
+        })
+    if len(cameras) == 0:
+        raise RuntimeError("DataSF returned no San Francisco speed cameras")
+    print(f"Found {len(cameras)} San Francisco cameras on DataSF (data up to {latest[:10]})")
+    return cameras
 
 def get_speed_cameras_from_overpass_api():
     # Faster public instance (recommended for large queries)
@@ -17,7 +67,7 @@ out geom;
         data=data,
         method='POST',
         headers={
-            'User-Agent': 'Catchcam-fetch-script[](https://github.com/IvanVnucec/catchcam)',
+            'User-Agent': USER_AGENT,
             'Accept': 'application/json',
             'Content-Type': 'application/x-www-form-urlencoded',
         }
@@ -25,7 +75,7 @@ out geom;
     with urllib.request.urlopen(req, timeout=600) as response:
         return json.loads(response.read())['elements']
 
-def get_cameras():
+def get_osm_cameras():
     overpass = get_speed_cameras_from_overpass_api()
     cameras = []
     invalid_maxspeed_cnt = 0
@@ -37,7 +87,9 @@ def get_cameras():
         except:
             invalid_maxspeed_cnt += 1
             limit = 0
-        cameras.append({'id': node['id'], 'lat': lat, 'lon': lon, 'limit': limit})
+        ref = f"https://www.openstreetmap.org/node/{node['id']}"
+        cameras.append({'lat': lat, 'lon': lon, 'limit': limit, 'ref': ref})
+    print(f"Found {len(cameras)} cameras on OpenStreetMap")
     print(f"Found {invalid_maxspeed_cnt} cameras with invalid maxspeed value")
     return cameras
 
@@ -49,10 +101,9 @@ def generate_c_file(output_file, data_list):
             lat = c["lat"]
             lon = c["lon"]
             limit = c["limit"]
-            id_ = c["id"]
-            osv_url = f"https://www.openstreetmap.org/node/{id_}"
+            ref = c["ref"]
             gmaps_url = f"https://maps.google.com/maps?q=&layer=c&cbll={lat},{lon}"
-            line = f'    {{ {lat:.7f}f, {lon:.7f}f, {limit} }}, // {osv_url} // {gmaps_url}\n'
+            line = f'    {{ {lat:.7f}f, {lon:.7f}f, {limit} }}, // {ref} // {gmaps_url}\n'
             cams_list += line
 
         f.write(f"""\
@@ -87,7 +138,9 @@ def generate_js_file(output_file, data_list):
 
 def main(output_file_h, output_file_js):
     print("Fetching cameras...")
-    cameras = get_cameras()
+    # Any failed source raises and aborts the script, so a list with
+    # missing cameras is never generated (the previous list stays in place)
+    cameras = get_sf_cameras() + get_osm_cameras()
     if len(cameras) == 0:
         print("No cameras found")
         sys.exit(1)
