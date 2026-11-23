@@ -15,6 +15,9 @@ SF_DATASET_URL = f"https://data.sf.gov/resource/{SF_DATASET_ID}.json"
 # record in the dataset. This drops positions of cameras that were relocated.
 SF_ACTIVE_WINDOW_DAYS = 60
 
+# Refuse a new list with fewer OSM cameras than this fraction of the previous one
+OSM_MIN_RATIO = 0.9
+
 def query_datasf(params):
     url = SF_DATASET_URL + '?' + urllib.parse.urlencode(params)
     req = urllib.request.Request(url, headers={'User-Agent': USER_AGENT, 'Accept': 'application/json'})
@@ -73,7 +76,11 @@ out geom;
         }
     )
     with urllib.request.urlopen(req, timeout=600) as response:
-        return json.loads(response.read())['elements']
+        result = json.loads(response.read())
+    # Overpass reports query errors (e.g. its own timeout) as HTTP 200 with a remark
+    if 'remark' in result:
+        raise RuntimeError(f"Overpass API: {result['remark']}")
+    return result['elements']
 
 def get_osm_cameras():
     overpass = get_speed_cameras_from_overpass_api()
@@ -136,11 +143,23 @@ def generate_js_file(output_file, data_list):
         contents += 'window.cams_list = cams_list;\n'
         f.write(contents)
 
+def count_osm_cameras(cams_file):
+    try:
+        with open(cams_file) as f:
+            return sum('openstreetmap.org/node/' in line for line in f)
+    except FileNotFoundError:
+        return 0
+
 def main(output_file_h, output_file_js):
     print("Fetching cameras...")
     # Any failed source raises and aborts the script, so a list with
     # missing cameras is never generated (the previous list stays in place)
-    cameras = get_sf_cameras() + get_osm_cameras()
+    sf_cameras = get_sf_cameras()
+    osm_cameras = get_osm_cameras()
+    prev_osm_cnt = count_osm_cameras(output_file_h)
+    if len(osm_cameras) < prev_osm_cnt * OSM_MIN_RATIO:
+        raise RuntimeError(f"Got only {len(osm_cameras)} cameras from OpenStreetMap, previous list had {prev_osm_cnt}")
+    cameras = sf_cameras + osm_cameras
     if len(cameras) == 0:
         print("No cameras found")
         sys.exit(1)
