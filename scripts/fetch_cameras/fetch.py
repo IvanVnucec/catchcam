@@ -1,5 +1,8 @@
 import sys
+import time
 from datetime import datetime, timedelta
+import http.client
+import urllib.error
 import urllib.request
 import urllib.parse
 import json
@@ -17,6 +20,19 @@ SF_ACTIVE_WINDOW_DAYS = 60
 
 # Refuse a new list with fewer OSM cameras than this fraction of the previous one
 OSM_MIN_RATIO = 0.9
+
+# Attempts rotate through the URLs. The query takes 4-5 min when the server isn't busy.
+OVERPASS_URLS = [
+    "https://overpass-api.de/api/interpreter",
+    "https://overpass.private.coffee/api/interpreter",
+]
+OVERPASS_QUERY = """[out:json][timeout:600];
+node["highway"="speed_camera"];
+out geom;
+"""
+OVERPASS_CLIENT_TIMEOUT_S = 700
+OVERPASS_RETRY_DELAYS_MIN = [1, 2, 4, 8]
+OVERPASS_RETRYABLE_HTTP = (429, 502, 503, 504)
 
 def query_datasf(params):
     url = SF_DATASET_URL + '?' + urllib.parse.urlencode(params)
@@ -57,16 +73,13 @@ def get_sf_cameras():
     print(f"Found {len(cameras)} San Francisco cameras on DataSF (data up to {latest[:10]})")
     return cameras
 
-def get_speed_cameras_from_overpass_api():
-    # Faster public instance (recommended for large queries)
-    overpass_url = "http://overpass-api.de/api/interpreter"
-    overpass_query = """[out:json][timeout:900];
-node["highway"="speed_camera"];
-out geom;
-"""
-    data = urllib.parse.urlencode({'data': overpass_query}).encode('utf-8')
+class OverpassError(RuntimeError):
+    pass
+
+def query_overpass(url):
+    data = urllib.parse.urlencode({'data': OVERPASS_QUERY}).encode('utf-8')
     req = urllib.request.Request(
-        overpass_url,
+        url,
         data=data,
         method='POST',
         headers={
@@ -75,12 +88,25 @@ out geom;
             'Content-Type': 'application/x-www-form-urlencoded',
         }
     )
-    with urllib.request.urlopen(req, timeout=600) as response:
+    with urllib.request.urlopen(req, timeout=OVERPASS_CLIENT_TIMEOUT_S) as response:
         result = json.loads(response.read())
     # Overpass reports query errors (e.g. its own timeout) as HTTP 200 with a remark
     if 'remark' in result:
-        raise RuntimeError(f"Overpass API: {result['remark']}")
+        raise OverpassError(result['remark'])
     return result['elements']
+
+def get_speed_cameras_from_overpass_api():
+    for attempt, delay in enumerate(OVERPASS_RETRY_DELAYS_MIN + [None]):
+        url = OVERPASS_URLS[attempt % len(OVERPASS_URLS)]
+        try:
+            return query_overpass(url)
+        except (OSError, http.client.HTTPException, json.JSONDecodeError, OverpassError) as e:
+            if isinstance(e, urllib.error.HTTPError) and e.code not in OVERPASS_RETRYABLE_HTTP:
+                raise
+            if delay is None:
+                raise
+            print(f"Overpass API {url} failed ({e}), retrying in {delay} min")
+            time.sleep(delay * 60)
 
 def get_osm_cameras():
     overpass = get_speed_cameras_from_overpass_api()
