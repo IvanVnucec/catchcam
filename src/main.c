@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <assert.h>
-#include <float.h>
 #include <math.h>
 
 #include <pico/stdlib.h>
@@ -13,7 +12,9 @@
 #include "leds/leds.h"
 #include "gnss/gnss.h"
 #include "cams/cams.h"
+#include "cams/cams_list.h"
 #include "audio/audio.h"
+#include "alert/alert.h"
 
 // Priorities of our threads - higher numbers are higher priority
 #define MAIN_TASK_PRIORITY              (tskIDLE_PRIORITY        + 1)
@@ -30,14 +31,6 @@
 #define SYS_BLINK_TASK_STACK_SIZE           configMINIMAL_STACK_SIZE
 #define CAM_DET_LED_WRN_TASK_STACK_SIZE     configMINIMAL_STACK_SIZE
 #define CAM_DET_AUDIO_WRN_TASK_STACK_SIZE   configMINIMAL_STACK_SIZE
-
-#define KNOTS_TO_KMPH(knots) ((knots) * 1.852f)
-#define KMPH_TO_MPS(kmph) ((kmph) / 3.6f)
-
-// Camera warning distance
-#define CAM_WRN_MIN_DIST_M              350.0f
-#define CAM_WRN_LOOKAHEAD_S             20.0f
-#define CAM_WRN_HYSTERESIS_M            50.0f
 
 // Camera detection LED warning data and task parameters
 struct cam_det_led_wrn_data {
@@ -234,84 +227,54 @@ static void main_task(__unused void *params)
     // Play one second pause
     audio_play_sample_async(audio_sample_data_queue, AUDIO_SAMPLES_ONE_SECOND_PAUSE);
 
-    const struct cams_camera_info *last_camera = NULL;
-    float last_camera_warning_radius_m = 0.0f;
-    float last_distance_squared_in_meters = FLT_MAX;
+    struct alert_state alert_state;
+    alert_init(&alert_state);
 
     while(true) {
         // Wait for gnss data
         struct gnss_data gnss_data;
         xQueueReceive(gnss_data_queue, &gnss_data, portMAX_DELAY);
 
-        if (gnss_data.valid == false) {
-            // Clear camera detection warning
-            last_camera = NULL;
-            last_distance_squared_in_meters = FLT_MAX;
-            continue;
+        if (gnss_data.valid) {
+            printf("GNSS data: valid=%d, speed=%.2f kmph, course=%.2f deg, lat=%.6f, lon=%.6f\n",
+                   gnss_data.valid, KNOTS_TO_KMPH(gnss_data.speed_knots), gnss_data.course_deg, gnss_data.pos.lat, gnss_data.pos.lon);
         }
 
-        float current_speed_kmph = KNOTS_TO_KMPH(gnss_data.speed_knots);
-
-        printf("GNSS data: valid=%d, speed=%.2f kmph, course=%.2f deg, lat=%.6f, lon=%.6f\n",
-               gnss_data.valid, current_speed_kmph, gnss_data.course_deg, gnss_data.pos.lat, gnss_data.pos.lon);
-
-        // Get nearest camera
-        const struct cams_camera_info *camera;
-        float distance_squared_in_meters = cams_get_nearest_camera(&camera, &gnss_data.pos, gnss_data.lon_scale_squared);
+        struct alert_actions alert = alert_update(&alert_state, &gnss_data, cams_list, cams_list_length);
+        const struct cams_camera_info *camera = alert.camera;
         if (camera == NULL) {
             continue;
         }
 
         printf("Nearest camera: lat=%.6f, lon=%.6f, limit=%d\n", camera->pos.lat, camera->pos.lon, camera->limit);
+        printf("Distance: %.2f m, warning radius: %.2f m\n", sqrtf(alert.distance_squared_in_meters), alert.warning_radius_m);
 
-        // Keep the radius the alert fired with
-        float warning_radius_m = camera == last_camera
-            ? last_camera_warning_radius_m
-            : fmaxf(CAM_WRN_MIN_DIST_M, KMPH_TO_MPS(current_speed_kmph) * CAM_WRN_LOOKAHEAD_S);
+        const uint8_t camera_limit = camera->limit;
 
-        printf("Distance: %.2f m, warning radius: %.2f m\n", sqrtf(distance_squared_in_meters), warning_radius_m);
+        if (alert.announce) {
+            // Flash and play camera detected warning
+            struct cam_det_led_wrn_data cam_det_led_wrn_data = {
+                .flash_count = camera_limit / 10u,
+            };
+            xQueueOverwrite(cam_det_led_wrn_data_queue, &cam_det_led_wrn_data);
 
-        // Check if we are close to a camera
-        if (distance_squared_in_meters <= warning_radius_m * warning_radius_m) {
-            const uint8_t camera_limit = camera->limit;
-            bool approaching = distance_squared_in_meters < last_distance_squared_in_meters;
-
-            // Alert only if this is a new camera and we're getting closer to it
-            if (last_camera != camera && approaching) {
-                // Flash and play camera detected warning
-                struct cam_det_led_wrn_data cam_det_led_wrn_data = {
-                    .flash_count = camera_limit / 10u,
-                };
-                xQueueOverwrite(cam_det_led_wrn_data_queue, &cam_det_led_wrn_data);
-
-                audio_play_sample_async(audio_sample_data_queue, AUDIO_SAMPLES_THREE_BEEPS);
-                play_camera_detected_warning(audio_sample_data_queue, camera_limit);
-
-                last_camera = camera;
-                last_camera_warning_radius_m = warning_radius_m + CAM_WRN_HYSTERESIS_M;
-            }
-
-            // Trigger camera detection warnings only if we're getting closer to the camera and the speed is above certain threshold
-            if (approaching && current_speed_kmph > 10.0f) {
-                // Play three beeps if the current speed is above the camera speed limit, otherwise play one beep
-                struct cam_det_audio_wrn_data cam_det_audio_wrn_data = {
-                    // TODO: handle different camera speed limit units
-                    .audio_sample = current_speed_kmph > camera_limit ? AUDIO_SAMPLES_THREE_BEEPS : AUDIO_SAMPLES_ONE_BEEP,
-                };
-                xQueueOverwrite(cam_det_audio_wrn_data_queue, &cam_det_audio_wrn_data);
-
-                // Flash camera detected LED based on the speed limit
-                struct cam_det_led_wrn_data cam_det_led_wrn_data = {
-                    .flash_count = camera_limit / 10u,
-                };
-                xQueueOverwrite(cam_det_led_wrn_data_queue, &cam_det_led_wrn_data);
-            }
-        } else {
-            // Clear camera detection warning
-            last_camera = NULL;
+            audio_play_sample_async(audio_sample_data_queue, AUDIO_SAMPLES_THREE_BEEPS);
+            play_camera_detected_warning(audio_sample_data_queue, camera_limit);
         }
 
-        last_distance_squared_in_meters = distance_squared_in_meters;
+        if (alert.warn) {
+            // Play three beeps if the current speed is above the camera speed limit, otherwise play one beep
+            struct cam_det_audio_wrn_data cam_det_audio_wrn_data = {
+                .audio_sample = alert.speeding ? AUDIO_SAMPLES_THREE_BEEPS : AUDIO_SAMPLES_ONE_BEEP,
+            };
+            xQueueOverwrite(cam_det_audio_wrn_data_queue, &cam_det_audio_wrn_data);
+
+            // Flash camera detected LED based on the speed limit
+            struct cam_det_led_wrn_data cam_det_led_wrn_data = {
+                .flash_count = camera_limit / 10u,
+            };
+            xQueueOverwrite(cam_det_led_wrn_data_queue, &cam_det_led_wrn_data);
+        }
     }
 }
 

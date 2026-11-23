@@ -1,11 +1,10 @@
+#include <assert.h>
 #include <float.h>
 #include <stddef.h>
 
 #include "cams.h"
-#include "cams_list.h"
-#include "gnss/gnss.h"
 
-float cams_get_nearest_camera(const struct cams_camera_info **cam, const struct gnss_position *pos, float lon_scale_squared)
+float cams_get_nearest_camera(const struct cams_camera_info *list, size_t list_length, const struct cams_camera_info **cam, const struct gnss_position *pos, float lon_scale_squared)
 {
     assert(cam);
     assert(pos);
@@ -13,11 +12,11 @@ float cams_get_nearest_camera(const struct cams_camera_info **cam, const struct 
     *cam = NULL;
     float min_dist = FLT_MAX;
 
-    for (size_t i=0; i<cams_list_length; i++) {
-        float dist = GNSS_DISTANCE_SQUARED_IN_METERS(cams_list[i].pos, *pos, lon_scale_squared);
+    for (size_t i=0; i<list_length; i++) {
+        float dist = GNSS_DISTANCE_SQUARED_IN_METERS(list[i].pos, *pos, lon_scale_squared);
         if (dist < min_dist) {
             min_dist = dist;
-            *cam = &cams_list[i];
+            *cam = &list[i];
         }
     }
 

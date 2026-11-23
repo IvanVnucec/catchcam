@@ -40,10 +40,12 @@ project(catchcam C CXX ASM)
 pico_sdk_init()
 
 add_executable(catchcam
+    src/alert/alert.c
     src/audio/audio.c
     src/cams/cams.c
     src/gnss/minmea/minmea.c
     src/gnss/gnss.c
+    src/gnss/gnss_nmea.c
     src/leds/leds.c
     src/main.c
 )

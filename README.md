@@ -62,6 +62,18 @@ cmake -B build -S .
 cmake --build build
 ```
 
+### Test
+
+The tests run on your PC and simulate drives past speed cameras (see `test/test_drive.c`).
+
+```sh
+cmake -S test -B test/build
+cmake --build test/build
+ctest --test-dir test/build --output-on-failure
+```
+
+To print the second-by-second timeline of every drive, run `DRIVE_LOG=1 ./test/build/test_drive`.
+
 ### Flash
 
 To flash the device, you need to put it into the bootloader mode. To do this, press and hold the button on the device while plugging it into your PC. The device will show up as a USB drive, and you can drag-and-drop the new software onto it located under `build/catchcam.uf2`. After the update is complete, the device will restart and you're good to go.

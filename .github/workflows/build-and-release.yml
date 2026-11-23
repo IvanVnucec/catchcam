@@ -17,7 +17,20 @@ env:
   BUILD_TYPE: Release
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout catchcam
+      uses: actions/checkout@v4
+
+    - name: Build tests
+      run: cmake -S test -B test/build && cmake --build test/build --parallel $(nproc)
+
+    - name: Run tests
+      run: ctest --test-dir test/build --output-on-failure
+
   build-and-release:
+    needs: test
     runs-on: ubuntu-latest
     steps:
     - name: Checkout catchcam
