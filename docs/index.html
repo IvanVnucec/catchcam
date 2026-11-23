@@ -371,7 +371,7 @@
                     <ul class="feature-list">
                         <li>Built-in speaker + flashing LEDs for real-time alerts</li>
                         <li>Preloaded with <strong>70,000+ global speed cameras</strong></li>
-                        <li>Updated daily from OpenStreetMap</li>
+                        <li>Updated daily from OpenStreetMap and official city data</li>
                         <li>Easy drag-and-drop updates via USB</li>
                         <li>No data collection — your privacy is guaranteed</li>
                     </ul>
@@ -414,7 +414,7 @@
                     <div class="card-body p-0 mt-3">
                         <div class="card-text-bottom">
                             <p class="mb-0">
-                                The database is updated <strong>daily from OpenStreetMap</strong>. Zoom in to see individual cameras (red dots). New cameras appear in Catchcam the next day.
+                                The database is updated <strong>daily from OpenStreetMap and official city data</strong>. Zoom in to see individual cameras (red dots). New cameras appear in Catchcam the next day.
                             </p>
                         </div>
                     </div>
@@ -490,6 +490,16 @@
                     <img src="https://librecounter.org/counter.svg" referrerpolicy="unsafe-url" alt="Visitor counter" style="height: 1em"/>
                 </a>
             </p>
+            <p class="small text-muted">
+                Camera data sources:
+                <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>,
+                <a href="https://data.sf.gov/" target="_blank">DataSF</a>,
+                <a href="https://opendata.dc.gov/" target="_blank">Open Data DC</a> (<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>),
+                <a href="https://data.cityofchicago.org/" target="_blank">City of Chicago</a>.
+            </p>
+            <p class="small text-muted">
+                This site provides applications using data that has been modified for use from its original source, www.cityofchicago.org, the official website of the City of Chicago. The City of Chicago makes no claims as to the content, accuracy, timeliness, or completeness of any of the data provided at this site. The data provided at this site is subject to change at any time. It is understood that the data provided at this site is being used at one’s own risk.
+            </p>
         </div>
     </footer>
 
@@ -552,7 +562,8 @@
                 // Add source
                 map.addSource('points', {
                     type: 'geojson',
-                    data: camerasGeoJSON
+                    data: camerasGeoJSON,
+                    attribution: 'Cameras: <a href="https://opendata.dc.gov/" target="_blank">Open Data DC</a> (CC BY 4.0), <a href="https://data.sf.gov/" target="_blank">DataSF</a>, <a href="https://data.cityofchicago.org/" target="_blank">City of Chicago</a>'
                 });
 
                 // Add circle layer

@@ -18,6 +18,14 @@ SF_DATASET_URL = f"https://data.sf.gov/resource/{SF_DATASET_ID}.json"
 # record in the dataset. This drops positions of cameras that were relocated.
 SF_ACTIVE_WINDOW_DAYS = 60
 
+# Washington DC speed cameras from Open Data DC (DDOT). License: CC BY 4.0, attribution required.
+DC_DATASET_ID = "03d94dc6579949ae9d7c9dd8ffebeb89"
+DC_LAYER_URL = "https://maps2.dcgis.dc.gov/dcgis/rest/services/DCGIS_DATA/Public_Safety_WebMercator/MapServer/43"
+
+# Chicago speed cameras from the Chicago Data Portal. License: City of Chicago Terms of Use.
+CHICAGO_DATASET_ID = "4i42-qv3h"
+CHICAGO_DATASET_URL = f"https://data.cityofchicago.org/resource/{CHICAGO_DATASET_ID}.json"
+
 # Refuse a new list with fewer OSM cameras than this fraction of the previous one
 OSM_MIN_RATIO = 0.9
 
@@ -34,11 +42,64 @@ OVERPASS_CLIENT_TIMEOUT_S = 700
 OVERPASS_RETRY_DELAYS_MIN = [1, 2, 4, 8]
 OVERPASS_RETRYABLE_HTTP = (429, 502, 503, 504)
 
-def query_datasf(params):
-    url = SF_DATASET_URL + '?' + urllib.parse.urlencode(params)
-    req = urllib.request.Request(url, headers={'User-Agent': USER_AGENT, 'Accept': 'application/json'})
+def http_get_json(url, params):
+    req = urllib.request.Request(url + '?' + urllib.parse.urlencode(params),
+                                 headers={'User-Agent': USER_AGENT, 'Accept': 'application/json'})
     with urllib.request.urlopen(req, timeout=120) as response:
         return json.loads(response.read())
+
+def query_datasf(params):
+    return http_get_json(SF_DATASET_URL, params)
+
+def get_dc_cameras():
+    result = http_get_json(DC_LAYER_URL + '/query', {
+        'where': "ENFORCEMENT_TYPE = 'Speed' AND ACTIVE_STATUS = 'Active'"
+                 " AND CAMERA_STATUS IN ('Live', 'Warning')"
+                 " AND (DEVICE_MOBILITY IS NULL OR DEVICE_MOBILITY <> 'Portable')"
+                 " AND CAMERA_LATITUDE IS NOT NULL AND CAMERA_LONGITUDE IS NOT NULL",
+        'outFields': 'ENFORCEMENT_SPACE_CODE,LOCATION_DESCRIPTION,SPEED_LIMIT,CAMERA_LATITUDE,CAMERA_LONGITUDE',
+        'returnGeometry': 'false',
+        'f': 'json',
+    })
+    # ArcGIS reports errors as HTTP 200
+    if 'error' in result:
+        raise RuntimeError(f"Open Data DC: {result['error']}")
+    if result.get('exceededTransferLimit'):
+        raise RuntimeError("Open Data DC: result was truncated")
+    cameras = []
+    for f in result.get('features', []):
+        a = f['attributes']
+        location = ' '.join((a.get('LOCATION_DESCRIPTION') or '').split())
+        cameras.append({
+            'lat': float(a['CAMERA_LATITUDE']),
+            'lon': float(a['CAMERA_LONGITUDE']),
+            'limit': int(a.get('SPEED_LIMIT') or 0),
+            'ref': f"https://opendata.dc.gov/datasets/{DC_DATASET_ID} {a['ENFORCEMENT_SPACE_CODE']} {location}",
+        })
+    if len(cameras) == 0:
+        raise RuntimeError("Open Data DC returned no Washington DC speed cameras")
+    print(f"Found {len(cameras)} Washington DC cameras on Open Data DC")
+    return cameras
+
+def get_chicago_cameras():
+    rows = http_get_json(CHICAGO_DATASET_URL, {
+        '$select': 'location_id, address, latitude, longitude',
+        '$where': f"latitude IS NOT NULL AND longitude IS NOT NULL AND go_live_date <= '{datetime.now():%Y-%m-%dT%H:%M:%S}'",
+        '$limit': 50000,
+    })
+    cameras = []
+    for r in rows:
+        address = ' '.join(r.get('address', '').split())
+        cameras.append({
+            'lat': float(r['latitude']),
+            'lon': float(r['longitude']),
+            'limit': 0,  # not in the dataset
+            'ref': f"https://data.cityofchicago.org/d/{CHICAGO_DATASET_ID} {r['location_id']} {address}",
+        })
+    if len(cameras) == 0:
+        raise RuntimeError("Chicago Data Portal returned no Chicago speed cameras")
+    print(f"Found {len(cameras)} Chicago cameras on the Chicago Data Portal")
+    return cameras
 
 def get_sf_cameras():
     where = "enforcement_type = 'FIXED SPEED' AND latitude IS NOT NULL AND longitude IS NOT NULL"
@@ -180,12 +241,12 @@ def main(output_file_h, output_file_js):
     print("Fetching cameras...")
     # Any failed source raises and aborts the script, so a list with
     # missing cameras is never generated (the previous list stays in place)
-    sf_cameras = get_sf_cameras()
+    city_cameras = get_sf_cameras() + get_dc_cameras() + get_chicago_cameras()
     osm_cameras = get_osm_cameras()
     prev_osm_cnt = count_osm_cameras(output_file_h)
     if len(osm_cameras) < prev_osm_cnt * OSM_MIN_RATIO:
         raise RuntimeError(f"Got only {len(osm_cameras)} cameras from OpenStreetMap, previous list had {prev_osm_cnt}")
-    cameras = sf_cameras + osm_cameras
+    cameras = city_cameras + osm_cameras
     if len(cameras) == 0:
         print("No cameras found")
         sys.exit(1)

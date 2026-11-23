@@ -23,7 +23,16 @@ If you're interested, you can pre-order a sample by sending an email to [vnucec.
 
 Catchcam uses a GPS module to determine your speed and position. It then compares your position to a database of known speed camera locations. If you're approaching a speed camera, Catchcam will alert you with a voice message spefiying the camera speed limit and a visual LED alert.
 
-Speed camera database is updated regularly from the [OpenStreetMap](https://www.openstreetmap.org/).
+### Camera data sources
+
+Speed camera database is updated daily from:
+
+- [OpenStreetMap](https://www.openstreetmap.org/copyright) © OpenStreetMap contributors
+- San Francisco: [DataSF](https://data.sf.gov/d/d5uh-bk84) (public domain, PDDL)
+- Washington DC: [Open Data DC](https://opendata.dc.gov/datasets/03d94dc6579949ae9d7c9dd8ffebeb89) (CC BY 4.0)
+- Chicago: [Chicago Data Portal](https://data.cityofchicago.org/d/4i42-qv3h)
+
+> This site provides applications using data that has been modified for use from its original source, www.cityofchicago.org, the official website of the City of Chicago. The City of Chicago makes no claims as to the content, accuracy, timeliness, or completeness of any of the data provided at this site. The data provided at this site is subject to change at any time. It is understood that the data provided at this site is being used at one’s own risk.
 
 ### See it in action
 
